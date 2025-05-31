@@ -5,17 +5,72 @@ import { Button } from '@/components/ui/button';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useResume } from '@/contexts/ResumeContext';
 import { toast } from '@/hooks/use-toast';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 
 export function Navbar() {
   const { theme, toggleTheme } = useTheme();
-  const { dispatch } = useResume();
+  const { dispatch, resumeData } = useResume();
 
-  const handleExportPDF = () => {
-    // For now, show a toast. We'll implement PDF export later
-    toast({
-      title: "Export Feature",
-      description: "PDF export functionality will be implemented next!",
-    });
+  const handleExportPDF = async () => {
+    try {
+      toast({
+        title: "Generating PDF",
+        description: "Please wait while we create your resume PDF...",
+      });
+
+      const element = document.querySelector('.print-page');
+      if (!element) {
+        throw new Error('Resume preview not found');
+      }
+
+      // Create canvas from the resume element
+      const canvas = await html2canvas(element as HTMLElement, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff',
+        width: element.scrollWidth,
+        height: element.scrollHeight,
+      });
+
+      // Calculate PDF dimensions
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4',
+      });
+
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
+      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+      const imgX = (pdfWidth - imgWidth * ratio) / 2;
+      const imgY = 0;
+
+      pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
+      
+      // Generate filename
+      const fileName = resumeData.personalInfo.fullName 
+        ? `${resumeData.personalInfo.fullName.replace(/\s+/g, '_')}_Resume.pdf`
+        : 'Resume.pdf';
+
+      pdf.save(fileName);
+
+      toast({
+        title: "PDF Generated Successfully",
+        description: "Your resume has been downloaded as a PDF file.",
+      });
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      toast({
+        title: "Export Failed",
+        description: "There was an error generating the PDF. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleReset = () => {

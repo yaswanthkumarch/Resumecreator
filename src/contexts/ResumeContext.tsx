@@ -58,7 +58,7 @@ export interface ResumeData {
   experience: Experience[];
   skills: Skill[];
   projects: Project[];
-  selectedTemplate: 'modern' | 'classic' | 'creative';
+  selectedTemplate: 'modern' | 'classic' | 'creative' | 'minimalist' | 'executive';
 }
 
 const initialResumeData: ResumeData = {
@@ -93,7 +93,7 @@ type ResumeAction =
   | { type: 'ADD_PROJECT'; payload: Project }
   | { type: 'UPDATE_PROJECT'; payload: { id: string; data: Partial<Project> } }
   | { type: 'DELETE_PROJECT'; payload: string }
-  | { type: 'SET_TEMPLATE'; payload: 'modern' | 'classic' | 'creative' }
+  | { type: 'SET_TEMPLATE'; payload: 'modern' | 'classic' | 'creative' | 'minimalist' | 'executive' }
   | { type: 'LOAD_DATA'; payload: ResumeData }
   | { type: 'RESET_DATA' };
 

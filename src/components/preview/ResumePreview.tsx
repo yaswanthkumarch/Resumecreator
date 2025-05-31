@@ -5,6 +5,8 @@ import { useResume } from '@/contexts/ResumeContext';
 import { ModernTemplate } from './templates/ModernTemplate';
 import { ClassicTemplate } from './templates/ClassicTemplate';
 import { CreativeTemplate } from './templates/CreativeTemplate';
+import { MinimalistTemplate } from './templates/MinimalistTemplate';
+import { ExecutiveTemplate } from './templates/ExecutiveTemplate';
 
 export function ResumePreview() {
   const { resumeData } = useResume();
@@ -18,6 +20,10 @@ export function ResumePreview() {
         return <ClassicTemplate data={resumeData} />;
       case 'creative':
         return <CreativeTemplate data={resumeData} />;
+      case 'minimalist':
+        return <MinimalistTemplate data={resumeData} />;
+      case 'executive':
+        return <ExecutiveTemplate data={resumeData} />;
       default:
         return <ModernTemplate data={resumeData} />;
     }

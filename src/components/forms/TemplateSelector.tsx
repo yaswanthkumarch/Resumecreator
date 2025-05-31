@@ -22,6 +22,18 @@ const templates = [
     name: 'Creative',
     description: 'Bold, visually appealing design for creative professionals',
     preview: 'Creative layout with unique styling and visual elements'
+  },
+  {
+    id: 'minimalist' as const,
+    name: 'Minimalist',
+    description: 'Ultra-clean design focusing on typography and white space',
+    preview: 'Minimalist layout with elegant simplicity'
+  },
+  {
+    id: 'executive' as const,
+    name: 'Executive',
+    description: 'Premium design with gold accents for senior professionals',
+    preview: 'Executive layout with sophisticated styling'
   }
 ];
 
@@ -29,7 +41,7 @@ export function TemplateSelector() {
   const { resumeData, dispatch } = useResume();
   const { selectedTemplate } = resumeData;
 
-  const selectTemplate = (template: 'modern' | 'classic' | 'creative') => {
+  const selectTemplate = (template: 'modern' | 'classic' | 'creative' | 'minimalist' | 'executive') => {
     dispatch({ type: 'SET_TEMPLATE', payload: template });
   };
 
@@ -39,7 +51,7 @@ export function TemplateSelector() {
         <CardTitle>Choose Template</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {templates.map((template) => (
             <div
               key={template.id}
