@@ -34,6 +34,24 @@ const templates = [
     name: 'Executive',
     description: 'Premium design with gold accents for senior professionals',
     preview: 'Executive layout with sophisticated styling'
+  },
+  {
+    id: 'professional' as const,
+    name: 'Professional',
+    description: 'Corporate design with blue accents and structured layout',
+    preview: 'Professional layout with corporate styling'
+  },
+  {
+    id: 'compact' as const,
+    name: 'Compact',
+    description: 'Space-efficient design that fits more content on one page',
+    preview: 'Compact layout maximizing space utilization'
+  },
+  {
+    id: 'two-column' as const,
+    name: 'Two-Column',
+    description: 'Sidebar layout with contact info and skills on the left',
+    preview: 'Two-column layout with dark sidebar'
   }
 ];
 
@@ -41,7 +59,7 @@ export function TemplateSelector() {
   const { resumeData, dispatch } = useResume();
   const { selectedTemplate } = resumeData;
 
-  const selectTemplate = (template: 'modern' | 'classic' | 'creative' | 'minimalist' | 'executive') => {
+  const selectTemplate = (template: 'modern' | 'classic' | 'creative' | 'minimalist' | 'executive' | 'professional' | 'compact' | 'two-column') => {
     dispatch({ type: 'SET_TEMPLATE', payload: template });
   };
 
@@ -51,7 +69,7 @@ export function TemplateSelector() {
         <CardTitle>Choose Template</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {templates.map((template) => (
             <div
               key={template.id}

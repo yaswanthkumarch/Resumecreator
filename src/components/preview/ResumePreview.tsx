@@ -7,6 +7,9 @@ import { ClassicTemplate } from './templates/ClassicTemplate';
 import { CreativeTemplate } from './templates/CreativeTemplate';
 import { MinimalistTemplate } from './templates/MinimalistTemplate';
 import { ExecutiveTemplate } from './templates/ExecutiveTemplate';
+import { ProfessionalTemplate } from './templates/ProfessionalTemplate';
+import { CompactTemplate } from './templates/CompactTemplate';
+import { TwoColumnTemplate } from './templates/TwoColumnTemplate';
 
 export function ResumePreview() {
   const { resumeData } = useResume();
@@ -24,6 +27,12 @@ export function ResumePreview() {
         return <MinimalistTemplate data={resumeData} />;
       case 'executive':
         return <ExecutiveTemplate data={resumeData} />;
+      case 'professional':
+        return <ProfessionalTemplate data={resumeData} />;
+      case 'compact':
+        return <CompactTemplate data={resumeData} />;
+      case 'two-column':
+        return <TwoColumnTemplate data={resumeData} />;
       default:
         return <ModernTemplate data={resumeData} />;
     }
