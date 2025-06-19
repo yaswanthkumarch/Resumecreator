@@ -1,6 +1,15 @@
-
 import React from 'react';
-import { User, GraduationCap, Briefcase, Star, FolderOpen, FileText, Palette } from 'lucide-react';
+import {
+  User,
+  GraduationCap,
+  Briefcase,
+  Star,
+  FolderOpen,
+  FileText,
+  Palette,
+  Gauge // 🆕 Import icon for Score
+} from 'lucide-react';
+
 import { cn } from '@/lib/utils';
 
 interface SidebarProps {
@@ -16,6 +25,7 @@ const sections = [
   { id: 'skills', label: 'Skills', icon: Star },
   { id: 'projects', label: 'Projects', icon: FolderOpen },
   { id: 'templates', label: 'Templates', icon: Palette },
+  { id: 'score', label: 'score', icon: Gauge }, // ✅ New Score section
 ];
 
 export function Sidebar({ activeSection, onSectionChange }: SidebarProps) {

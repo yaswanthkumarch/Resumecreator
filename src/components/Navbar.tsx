@@ -89,7 +89,7 @@ export function Navbar() {
         <div className="flex items-center space-x-2">
           <FileText className="h-6 w-6 text-primary" />
           <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
-            AI Resume Builder
+            Deevan kumar reume maker
           </h1>
         </div>
         

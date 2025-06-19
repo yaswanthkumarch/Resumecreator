@@ -123,3 +123,7 @@
     break-inside: avoid;
   }
 }
+/* src/styles/globals.css */
+.section-heading {
+  @apply text-xl font-semibold text-gray-900 mb-4 border-b-2 border-blue-600 pb-1;
+}

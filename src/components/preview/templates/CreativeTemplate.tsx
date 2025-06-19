@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { ResumeData } from '@/contexts/ResumeContext';
 import { Mail, Phone, Link, MapPin, Star } from 'lucide-react';
@@ -40,14 +39,11 @@ export function CreativeTemplate({ data }: CreativeTemplateProps) {
   }, {} as Record<string, typeof skills>);
 
   return (
-    <div className="p-6 font-playfair max-w-4xl mx-auto bg-gradient-to-br from-purple-50 to-pink-50">
+    <div className="p-6 font-playfair max-w-5xl mx-auto bg-gradient-to-br from-purple-50 to-pink-50 space-y-6 overflow-hidden">
       {/* Header */}
-      <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white p-6 rounded-lg mb-6">
-        <h1 className="text-4xl font-bold mb-3">
-          {personalInfo.fullName || 'Your Name'}
-        </h1>
-        
-        <div className="grid grid-cols-2 gap-4 text-sm">
+      <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white p-6 rounded-lg space-y-4">
+        <h1 className="text-3xl sm:text-4xl font-bold break-words">{personalInfo.fullName || 'Your Name'}</h1>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
           {personalInfo.email && (
             <div className="flex items-center gap-2">
               <Mail className="w-4 h-4" />
@@ -77,12 +73,12 @@ export function CreativeTemplate({ data }: CreativeTemplateProps) {
 
       {/* Summary */}
       {summary && (
-        <div className="bg-white rounded-lg p-6 mb-6 shadow-sm">
-          <h2 className="text-2xl font-bold text-purple-800 mb-4 flex items-center">
+        <div className="bg-white rounded-lg p-6 shadow-sm space-y-2">
+          <h2 className="text-2xl font-bold text-purple-800 flex items-center">
             <div className="w-2 h-8 bg-gradient-to-b from-purple-600 to-pink-600 rounded mr-3"></div>
             About Me
           </h2>
-          <p className="text-gray-700 leading-relaxed italic">{summary}</p>
+          <p className="text-gray-700 italic leading-relaxed">{summary}</p>
         </div>
       )}
 
@@ -98,19 +94,19 @@ export function CreativeTemplate({ data }: CreativeTemplateProps) {
               </h2>
               <div className="space-y-6">
                 {experience.map((exp) => (
-                  <div key={exp.id} className="relative pl-6">
+                  <div key={exp.id} className="relative pl-6 min-h-[80px]">
                     <div className="absolute left-0 top-2 w-3 h-3 bg-purple-600 rounded-full"></div>
-                    <div className="absolute left-1.5 top-5 w-0.5 h-full bg-purple-200"></div>
-                    <div className="mb-2">
+                    <div className="absolute left-1.5 top-5 bottom-0 w-0.5 bg-purple-200"></div>
+                    <div className="mb-2 space-y-1">
                       <h3 className="text-lg font-bold text-gray-900">{exp.position}</h3>
                       <p className="text-purple-700 font-semibold">{exp.company}</p>
                       <p className="text-sm text-gray-500">
-                        {formatDate(exp.startDate)} - {exp.current ? 'Present' : formatDate(exp.endDate)}
+                        {formatDate(exp.startDate)} – {exp.current ? 'Present' : formatDate(exp.endDate)}
                       </p>
                     </div>
                     {exp.bulletPoints.length > 0 && (
-                      <ul className="space-y-1 text-gray-700">
-                        {exp.bulletPoints.map((point, index) => 
+                      <ul className="space-y-1 text-gray-700 mt-2">
+                        {exp.bulletPoints.map((point, index) =>
                           point.trim() && (
                             <li key={index} className="flex items-start">
                               <span className="text-purple-600 mr-2">▪</span>
@@ -133,18 +129,18 @@ export function CreativeTemplate({ data }: CreativeTemplateProps) {
                 <div className="w-2 h-8 bg-gradient-to-b from-purple-600 to-pink-600 rounded mr-3"></div>
                 Featured Projects
               </h2>
-              <div className="grid gap-4">
+              <div className="space-y-4">
                 {projects.map((project) => (
-                  <div key={project.id} className="border-l-4 border-purple-600 pl-4 bg-purple-50 p-4 rounded-r">
-                    <div className="flex justify-between items-start mb-2">
+                  <div key={project.id} className="border-l-4 border-purple-600 pl-4 bg-purple-50 p-4 rounded-r space-y-2">
+                    <div className="flex justify-between flex-wrap items-start gap-2">
                       <h3 className="font-bold text-gray-900">{project.title}</h3>
                       <span className="text-sm text-gray-500">
-                        {formatDate(project.startDate)} - {formatDate(project.endDate)}
+                        {formatDate(project.startDate)} – {formatDate(project.endDate)}
                       </span>
                     </div>
-                    <p className="text-gray-700 mb-3">{project.description}</p>
+                    <p className="text-gray-700">{project.description}</p>
                     {project.technologies.length > 0 && (
-                      <div className="flex flex-wrap gap-2 mb-3">
+                      <div className="flex flex-wrap gap-2">
                         {project.technologies.map((tech, index) => (
                           <span
                             key={index}
@@ -212,17 +208,15 @@ export function CreativeTemplate({ data }: CreativeTemplateProps) {
               </h2>
               <div className="space-y-4">
                 {education.map((edu) => (
-                  <div key={edu.id} className="border-l-2 border-purple-300 pl-4">
+                  <div key={edu.id} className="border-l-2 border-purple-300 pl-4 space-y-1">
                     <h3 className="font-bold text-gray-900 text-sm">{edu.degree}</h3>
                     {edu.field && <p className="text-gray-700 text-sm">{edu.field}</p>}
                     <p className="text-purple-700 font-medium text-sm">{edu.school}</p>
                     <p className="text-xs text-gray-500">
-                      {formatDate(edu.startDate)} - {formatDate(edu.endDate)}
+                      {formatDate(edu.startDate)} – {formatDate(edu.endDate)}
                     </p>
                     {edu.gpa && <p className="text-xs text-gray-600">GPA: {edu.gpa}</p>}
-                    {edu.description && (
-                      <p className="text-xs text-gray-600 mt-1">{edu.description}</p>
-                    )}
+                    {edu.description && <p className="text-xs text-gray-600 mt-1">{edu.description}</p>}
                   </div>
                 ))}
               </div>

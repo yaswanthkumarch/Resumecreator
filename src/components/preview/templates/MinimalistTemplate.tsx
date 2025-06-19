@@ -1,7 +1,6 @@
-
 import React from 'react';
 import { ResumeData } from '@/contexts/ResumeContext';
-import { Mail, Phone, Link, MapPin } from 'lucide-react';
+import { Mail, Phone, Link, MapPin, ExternalLink } from 'lucide-react';
 
 interface MinimalistTemplateProps {
   data: ResumeData;
@@ -10,198 +9,217 @@ interface MinimalistTemplateProps {
 export function MinimalistTemplate({ data }: MinimalistTemplateProps) {
   const { personalInfo, summary, education, experience, skills, projects } = data;
 
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString?: string) => {
     if (!dateString) return '';
     const date = new Date(dateString + '-01');
     return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
   };
 
   const skillsByCategory = skills.reduce((acc, skill) => {
-    if (!acc[skill.category]) {
-      acc[skill.category] = [];
-    }
+    if (!acc[skill.category]) acc[skill.category] = [];
     acc[skill.category].push(skill);
     return acc;
   }, {} as Record<string, typeof skills>);
 
   return (
-    <div className="p-12 font-inter max-w-4xl mx-auto bg-white text-gray-900">
+    <div className="max-w-4xl mx-auto p-12 bg-white text-gray-900 font-sans shadow-xl rounded-lg border border-gray-200">
       {/* Header */}
-      <div className="mb-12">
-        <h1 className="text-5xl font-light text-gray-900 mb-4 tracking-tight">
+      <header className="mb-12 border-b border-indigo-400 pb-6 text-center">
+        <h1 className="text-5xl font-extrabold tracking-tight text-indigo-700 mb-3">
           {personalInfo.fullName || 'Your Name'}
         </h1>
-        
-        <div className="flex flex-wrap gap-6 text-sm text-gray-600 font-light">
+        <div className="flex flex-wrap justify-center gap-8 text-gray-600 text-sm font-light">
           {personalInfo.email && (
-            <div className="flex items-center gap-2">
-              <Mail className="w-4 h-4" />
-              {personalInfo.email}
+            <div className="flex items-center gap-2 hover:text-indigo-600 transition-colors cursor-pointer">
+              <Mail className="w-5 h-5" />
+              <a href={`mailto:${personalInfo.email}`}>{personalInfo.email}</a>
             </div>
           )}
           {personalInfo.phone && (
             <div className="flex items-center gap-2">
-              <Phone className="w-4 h-4" />
-              {personalInfo.phone}
+              <Phone className="w-5 h-5" />
+              <span>{personalInfo.phone}</span>
             </div>
           )}
           {personalInfo.linkedin && (
-            <div className="flex items-center gap-2">
-              <Link className="w-4 h-4" />
-              {personalInfo.linkedin}
+            <div className="flex items-center gap-2 hover:text-indigo-600 transition-colors cursor-pointer">
+              <Link className="w-5 h-5" />
+              <a href={personalInfo.linkedin} target="_blank" rel="noopener noreferrer" className="underline">
+                LinkedIn
+              </a>
             </div>
           )}
           {personalInfo.address && (
             <div className="flex items-center gap-2">
-              <MapPin className="w-4 h-4" />
-              {personalInfo.address}
+              <MapPin className="w-5 h-5" />
+              <span>{personalInfo.address}</span>
             </div>
           )}
         </div>
-      </div>
+      </header>
 
       {/* Summary */}
       {summary && (
-        <div className="mb-12">
-          <p className="text-gray-700 leading-relaxed text-lg font-light">{summary}</p>
-        </div>
+        <section className="mb-12 max-w-3xl mx-auto">
+          <p className="text-lg text-gray-700 font-light leading-relaxed italic border-l-4 border-indigo-400 pl-4">
+            {summary}
+          </p>
+        </section>
       )}
 
-      {/* Experience */}
-      {experience.length > 0 && (
-        <div className="mb-12">
-          <h2 className="text-2xl font-light text-gray-900 mb-8 tracking-wide">
-            Experience
-          </h2>
-          <div className="space-y-8">
-            {experience.map((exp) => (
-              <div key={exp.id}>
-                <div className="flex justify-between items-start mb-3">
-                  <div>
-                    <h3 className="text-xl font-medium text-gray-900">{exp.position}</h3>
-                    <p className="text-gray-600 font-light">{exp.company}</p>
-                  </div>
-                  <div className="text-sm text-gray-500 font-light">
-                    {formatDate(exp.startDate)} — {exp.current ? 'Present' : formatDate(exp.endDate)}
-                  </div>
-                </div>
-                {exp.bulletPoints.length > 0 && (
-                  <ul className="space-y-2 text-gray-700 font-light">
-                    {exp.bulletPoints.map((point, index) => 
-                      point.trim() && (
-                        <li key={index} className="leading-relaxed pl-4 relative">
-                          <span className="absolute left-0 top-2 w-1 h-1 bg-gray-400 rounded-full"></span>
-                          {point}
-                        </li>
-                      )
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-14">
+        {/* Left Column: Experience + Projects */}
+        <div className="space-y-14">
+          {/* Experience */}
+          {experience.length > 0 && (
+            <section>
+              <h2 className="text-3xl font-semibold text-indigo-700 border-b border-indigo-300 pb-2 mb-8 tracking-wide">
+                Experience
+              </h2>
+              <div className="space-y-10">
+                {experience.map((exp) => (
+                  <article key={exp.id} className="group">
+                    <header className="flex justify-between items-start mb-3">
+                      <div>
+                        <h3 className="text-xl font-bold text-gray-900">{exp.position}</h3>
+                        <p className="text-indigo-600 font-semibold">{exp.company}</p>
+                      </div>
+                      <time className="text-sm text-gray-500 font-mono">
+                        {formatDate(exp.startDate)} — {exp.current ? 'Present' : formatDate(exp.endDate)}
+                      </time>
+                    </header>
+                    {exp.bulletPoints.length > 0 && (
+                      <ul className="list-disc list-inside text-gray-700 font-light space-y-1 pl-5">
+                        {exp.bulletPoints.map(
+                          (point, i) =>
+                            point.trim() && (
+                              <li key={i} className="leading-relaxed">
+                                {point}
+                              </li>
+                            )
+                        )}
+                      </ul>
                     )}
-                  </ul>
-                )}
+                  </article>
+                ))}
               </div>
-            ))}
-          </div>
-        </div>
-      )}
+            </section>
+          )}
 
-      {/* Education */}
-      {education.length > 0 && (
-        <div className="mb-12">
-          <h2 className="text-2xl font-light text-gray-900 mb-8 tracking-wide">
-            Education
-          </h2>
-          <div className="space-y-6">
-            {education.map((edu) => (
-              <div key={edu.id}>
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="text-lg font-medium text-gray-900">{edu.degree} {edu.field && `in ${edu.field}`}</h3>
-                    <p className="text-gray-600 font-light">{edu.school}</p>
-                    {edu.gpa && <p className="text-sm text-gray-500">GPA: {edu.gpa}</p>}
-                  </div>
-                  <div className="text-sm text-gray-500 font-light">
-                    {formatDate(edu.startDate)} — {formatDate(edu.endDate)}
-                  </div>
-                </div>
-                {edu.description && (
-                  <p className="text-gray-700 mt-2 font-light">{edu.description}</p>
-                )}
+          {/* Projects */}
+          {projects.length > 0 && (
+            <section>
+              <h2 className="text-3xl font-semibold text-indigo-700 border-b border-indigo-300 pb-2 mb-8 tracking-wide">
+                Projects
+              </h2>
+              <div className="space-y-10">
+                {projects.map((project) => (
+                  <article key={project.id}>
+                    <header className="flex justify-between items-center mb-3">
+                      <h3 className="text-xl font-bold text-gray-900">{project.title}</h3>
+                      <time className="text-sm text-gray-500 font-mono">
+                        {formatDate(project.startDate)} — {formatDate(project.endDate)}
+                      </time>
+                    </header>
+                    <p className="text-gray-700 font-light mb-3">{project.description}</p>
+                    <div className="flex flex-wrap gap-3 mb-4">
+                      {project.technologies.map((tech, i) => (
+                        <span
+                          key={i}
+                          className="text-indigo-700 bg-indigo-100 rounded-full px-3 py-1 text-xs font-semibold"
+                        >
+                          {tech}
+                        </span>
+                      ))}
+                    </div>
+                    <div className="flex gap-6 text-indigo-600 font-medium text-sm">
+                      {project.link && (
+                        <a
+                          href={project.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 hover:underline"
+                        >
+                          Live Demo <ExternalLink className="w-4 h-4" />
+                        </a>
+                      )}
+                      {project.github && (
+                        <a
+                          href={project.github}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 hover:underline"
+                        >
+                          GitHub <ExternalLink className="w-4 h-4" />
+                        </a>
+                      )}
+                    </div>
+                  </article>
+                ))}
               </div>
-            ))}
-          </div>
+            </section>
+          )}
         </div>
-      )}
 
-      {/* Skills */}
-      {skills.length > 0 && (
-        <div className="mb-12">
-          <h2 className="text-2xl font-light text-gray-900 mb-8 tracking-wide">
-            Skills
-          </h2>
-          <div className="space-y-4">
-            {Object.entries(skillsByCategory).map(([category, categorySkills]) => (
-              <div key={category}>
-                <h3 className="font-medium text-gray-800 mb-3">{category}</h3>
-                <div className="flex flex-wrap gap-3">
-                  {categorySkills.map((skill) => (
-                    <span
-                      key={skill.id}
-                      className="text-gray-700 font-light border-b border-gray-300 pb-1"
-                    >
-                      {skill.name}
-                    </span>
-                  ))}
-                </div>
+        {/* Right Column: Education + Skills */}
+        <div className="space-y-14">
+          {/* Education */}
+          {education.length > 0 && (
+            <section>
+              <h2 className="text-3xl font-semibold text-indigo-700 border-b border-indigo-300 pb-2 mb-8 tracking-wide">
+                Education
+              </h2>
+              <div className="space-y-10">
+                {education.map((edu) => (
+                  <article key={edu.id}>
+                    <header className="flex justify-between items-start mb-3">
+                      <div>
+                        <h3 className="text-xl font-bold text-gray-900">
+                          {edu.degree} {edu.field && <span className="italic font-light">in {edu.field}</span>}
+                        </h3>
+                        <p className="text-indigo-600 font-semibold">{edu.school}</p>
+                        {edu.gpa && <p className="text-sm text-gray-500 mt-1">GPA: {edu.gpa}</p>}
+                      </div>
+                      <time className="text-sm text-gray-500 font-mono">
+                        {formatDate(edu.startDate)} — {formatDate(edu.endDate)}
+                      </time>
+                    </header>
+                    {edu.description && (
+                      <p className="text-gray-700 font-light leading-relaxed">{edu.description}</p>
+                    )}
+                  </article>
+                ))}
               </div>
-            ))}
-          </div>
-        </div>
-      )}
+            </section>
+          )}
 
-      {/* Projects */}
-      {projects.length > 0 && (
-        <div className="mb-12">
-          <h2 className="text-2xl font-light text-gray-900 mb-8 tracking-wide">
-            Projects
-          </h2>
-          <div className="space-y-6">
-            {projects.map((project) => (
-              <div key={project.id}>
-                <div className="flex justify-between items-start mb-2">
-                  <h3 className="text-lg font-medium text-gray-900">{project.title}</h3>
-                  <div className="text-sm text-gray-500 font-light">
-                    {formatDate(project.startDate)} — {formatDate(project.endDate)}
+          {/* Skills */}
+          {skills.length > 0 && (
+            <section>
+              <h2 className="text-3xl font-semibold text-indigo-700 border-b border-indigo-300 pb-2 mb-8 tracking-wide">
+                Skills
+              </h2>
+              <div className="space-y-8">
+                {Object.entries(skillsByCategory).map(([category, categorySkills]) => (
+                  <div key={category}>
+                    <h3 className="text-xl font-bold text-gray-900 mb-4">{category}</h3>
+                    <div className="flex flex-wrap gap-4">
+                      {categorySkills.map((skill) => (
+                        <span
+                          key={skill.id}
+                          className="bg-indigo-100 text-indigo-700 font-semibold rounded-full px-4 py-1 text-sm"
+                        >
+                          {skill.name}
+                        </span>
+                      ))}
+                    </div>
                   </div>
-                </div>
-                <p className="text-gray-700 mb-3 font-light">{project.description}</p>
-                {project.technologies.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mb-3">
-                    {project.technologies.map((tech, index) => (
-                      <span
-                        key={index}
-                        className="text-xs text-gray-600 font-light border border-gray-300 px-2 py-1 rounded"
-                      >
-                        {tech}
-                      </span>
-                    ))}
-                  </div>
-                )}
-                <div className="flex gap-6 text-sm font-light">
-                  {project.link && (
-                    <a href={project.link} className="text-gray-600 hover:text-gray-900 border-b border-gray-300">
-                      Live Demo
-                    </a>
-                  )}
-                  {project.github && (
-                    <a href={project.github} className="text-gray-600 hover:text-gray-900 border-b border-gray-300">
-                      GitHub
-                    </a>
-                  )}
-                </div>
+                ))}
               </div>
-            ))}
-          </div>
+            </section>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 }
