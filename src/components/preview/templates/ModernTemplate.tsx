@@ -37,7 +37,7 @@ export function ModernTemplate({ data }: ModernTemplateProps) {
       <header className="mb-10 flex flex-col md:flex-row md:justify-between md:items-center">
         <div>
           <h1 className="text-5xl font-extrabold tracking-tight">{personalInfo.fullName || 'Your Name'}</h1>
-          <p className="text-gray-600 mt-2">{personalInfo.title || 'Your Professional Title'}</p>
+          {/* <p className="text-gray-600 mt-2">{experience.position || 'Your Professional Title'}</p> */}
         </div>
         <div className="flex gap-5 mt-6 md:mt-0 text-gray-500">
           {personalInfo.email && (

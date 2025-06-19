@@ -20,45 +20,53 @@ export function ClassicTemplate({ data }: ClassicTemplateProps) {
   }, {} as Record<string, typeof skills>);
 
   return (
-    <div className="font-lora text-gray-900 bg-white p-10 max-w-4xl mx-auto shadow-lg ring-1 ring-gray-200">
+    <div className="font-serif text-gray-900 bg-white max-w-4xl mx-auto p-12 rounded-lg shadow-xl ring-1 ring-gray-200">
       {/* Header */}
-      <header className="text-center mb-10 pb-6 border-b-2 border-gray-300">
-        <h1 className="text-4xl font-bold">{personalInfo.fullName || 'Your Name'}</h1>
-        <p className="mt-2 text-gray-600">
-          {personalInfo.email && personalInfo.email + ' • '}
-          {personalInfo.phone && personalInfo.phone + ' • '}
-          {personalInfo.linkedin && personalInfo.linkedin + ' • '}
-          {personalInfo.address}
+      <header className="text-center mb-12 border-b-4 border-blue-600 pb-6">
+        <h1 className="text-5xl font-extrabold tracking-tight text-blue-900">
+          {personalInfo.fullName || 'Your Name'}
+        </h1>
+        <p className="mt-3 text-lg text-gray-700 space-x-3 flex justify-center flex-wrap gap-3">
+          {personalInfo.email && <span>{personalInfo.email}</span>}
+          {personalInfo.phone && <span>• {personalInfo.phone}</span>}
+          {personalInfo.linkedin && <span>• {personalInfo.linkedin}</span>}
+          {personalInfo.address && <span>• {personalInfo.address}</span>}
         </p>
       </header>
 
       {/* Professional Summary */}
       {summary && (
-        <section className="mb-8">
-          <h2 className="text-2xl font-semibold text-center text-blue-800 mb-2">Professional Summary</h2>
-          <p className="text-gray-700 leading-relaxed">{summary}</p>
+        <section className="mb-12">
+          <h2 className="text-3xl font-semibold text-blue-700 border-l-4 border-blue-600 pl-4 mb-4">
+            Professional Summary
+          </h2>
+          <p className="text-gray-700 leading-relaxed text-lg">{summary}</p>
         </section>
       )}
 
       {/* Experience & Education */}
-      <div className="md:flex md:gap-8">
+      <div className="md:flex md:space-x-12 mb-12">
         {/* Experience */}
         {experience.length > 0 && (
-          <section className="md:w-1/2 mb-8">
-            <h2 className="text-xl font-semibold text-blue-800 border-b-4 border-blue-200 mb-4">Experience</h2>
-            <ul className="space-y-6">
+          <section className="md:w-1/2 mb-10 md:mb-0">
+            <h2 className="text-2xl font-semibold text-blue-700 border-b-4 border-blue-600 pb-2 mb-6">
+              Experience
+            </h2>
+            <ul className="space-y-8">
               {experience.map((exp) => (
-                <li key={exp.id}>
-                  <div className="flex justify-between items-center mb-1">
+                <li key={exp.id} className="group">
+                  <div className="flex justify-between items-center mb-2">
                     <div>
-                      <h3 className="text-lg font-bold">{exp.position}</h3>
-                      <p className="text-blue-600">{exp.company}</p>
+                      <h3 className="text-xl font-bold text-gray-900 group-hover:text-blue-700 transition">
+                        {exp.position}
+                      </h3>
+                      <p className="text-blue-600 italic">{exp.company}</p>
                     </div>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-gray-500 italic">
                       {formatDate(exp.startDate)} – {exp.current ? 'Present' : formatDate(exp.endDate)}
                     </p>
                   </div>
-                  <ul className="list-disc list-inside text-gray-700 space-y-1">
+                  <ul className="list-disc list-inside text-gray-700 space-y-1 pl-4">
                     {exp.bulletPoints.map((pt, i) => pt.trim() && <li key={i}>{pt}</li>)}
                   </ul>
                 </li>
@@ -69,22 +77,29 @@ export function ClassicTemplate({ data }: ClassicTemplateProps) {
 
         {/* Education */}
         {education.length > 0 && (
-          <section className="md:w-1/2 mb-8">
-            <h2 className="text-xl font-semibold text-blue-800 border-b-4 border-blue-200 mb-4">Education</h2>
-            <ul className="space-y-6">
+          <section className="md:w-1/2">
+            <h2 className="text-2xl font-semibold text-blue-700 border-b-4 border-blue-600 pb-2 mb-6">
+              Education
+            </h2>
+            <ul className="space-y-8">
               {education.map((edu) => (
                 <li key={edu.id}>
-                  <div className="flex justify-between items-center">
+                  <div className="flex justify-between items-center mb-1">
                     <div>
-                      <h3 className="font-bold">{edu.degree}{edu.field && `, ${edu.field}`}</h3>
-                      <p className="text-gray-600">{edu.school}</p>
+                      <h3 className="font-bold text-gray-900 text-lg">
+                        {edu.degree}
+                        {edu.field && `, ${edu.field}`}
+                      </h3>
+                      <p className="text-gray-600 italic">{edu.school}</p>
                     </div>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-gray-500 italic">
                       {formatDate(edu.startDate)} – {formatDate(edu.endDate)}
                     </p>
                   </div>
-                  {edu.gpa && <p className="text-gray-700 mt-1">GPA: {edu.gpa}</p>}
-                  {edu.description && <p className="text-gray-700 mt-1 italic">{edu.description}</p>}
+                  {edu.gpa && <p className="text-gray-700 mt-1 font-medium">GPA: {edu.gpa}</p>}
+                  {edu.description && (
+                    <p className="text-gray-600 mt-1 italic max-w-prose">{edu.description}</p>
+                  )}
                 </li>
               ))}
             </ul>
@@ -93,19 +108,21 @@ export function ClassicTemplate({ data }: ClassicTemplateProps) {
       </div>
 
       {/* Skills & Projects */}
-      <div className="md:flex md:gap-8">
+      <div className="md:flex md:space-x-12">
         {/* Skills */}
         {skills.length > 0 && (
-          <section className="md:w-1/2 mb-8">
-            <h2 className="text-xl font-semibold text-blue-800 border-b-4 border-blue-200 mb-4">Skills</h2>
+          <section className="md:w-1/2 mb-10 md:mb-0">
+            <h2 className="text-2xl font-semibold text-blue-700 border-b-4 border-blue-600 pb-2 mb-6">
+              Skills
+            </h2>
             {Object.entries(skillsByCategory).map(([cat, skills]) => (
-              <div key={cat} className="mb-4">
-                <h3 className="font-semibold text-gray-800">{cat}</h3>
-                <div className="flex flex-wrap gap-2 mt-2">
+              <div key={cat} className="mb-6">
+                <h3 className="font-semibold text-gray-800 text-lg mb-3">{cat}</h3>
+                <div className="flex flex-wrap gap-3">
                   {skills.map((s) => (
                     <span
                       key={s.id}
-                      className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
+                      className="px-4 py-1 bg-blue-100 text-blue-900 rounded-full text-sm font-medium shadow-sm"
                     >
                       {s.name}
                     </span>
@@ -118,31 +135,33 @@ export function ClassicTemplate({ data }: ClassicTemplateProps) {
 
         {/* Projects */}
         {projects.length > 0 && (
-          <section className="md:w-1/2 mb-8">
-            <h2 className="text-xl font-semibold text-blue-800 border-b-4 border-blue-200 mb-4">Projects</h2>
-            <ul className="space-y-6">
+          <section className="md:w-1/2">
+            <h2 className="text-2xl font-semibold text-blue-700 border-b-4 border-blue-600 pb-2 mb-6">
+              Projects
+            </h2>
+            <ul className="space-y-8">
               {projects.map((p) => (
                 <li key={p.id}>
-                  <div className="flex justify-between items-center mb-1">
-                    <h3 className="font-bold text-gray-900">{p.title}</h3>
-                    <p className="text-sm text-gray-500">
+                  <div className="flex justify-between items-center mb-2">
+                    <h3 className="font-bold text-gray-900 text-xl">{p.title}</h3>
+                    <p className="text-sm text-gray-500 italic">
                       {formatDate(p.startDate)} – {formatDate(p.endDate)}
                     </p>
                   </div>
-                  <p className="text-gray-700">{p.description}</p>
+                  <p className="text-gray-700 leading-relaxed">{p.description}</p>
                   {p.technologies.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mt-2">
+                    <div className="flex flex-wrap gap-3 mt-3">
                       {p.technologies.map((tech, idx) => (
                         <span
                           key={idx}
-                          className="px-2 py-1 bg-gray-200 text-gray-800 rounded text-sm"
+                          className="px-3 py-1 bg-gray-200 text-gray-800 rounded-full text-sm font-medium"
                         >
                           {tech}
                         </span>
                       ))}
                     </div>
                   )}
-                  <div className="mt-2 flex flex-wrap gap-4 text-sm">
+                  <div className="mt-3 flex flex-wrap gap-6 text-sm font-medium">
                     {p.link && (
                       <a
                         href={p.link}
