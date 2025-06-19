@@ -46,30 +46,37 @@ const Index = () => {
   return (
     <ThemeProvider>
       <ResumeProvider>
-        <div className="min-h-screen bg-background">
+        <div className="min-h-screen bg-background text-foreground">
+          {/* Navbar */}
           <Navbar />
 
-          <div className="flex h-[calc(100vh-4rem)]">
-            {/* Sidebars */}
-            <Sidebar activeSection={activeSection} onSectionChange={setActiveSection} />
-            <MobileSidebar activeSection={activeSection} onSectionChange={setActiveSection} />
+          {/* Mobile Sidebar */}
+          <MobileSidebar
+            activeSection={activeSection}
+            onSectionChange={setActiveSection}
+          />
+
+          <div className="flex flex-col lg:flex-row h-[calc(100vh-4rem)]">
+            {/* Desktop Sidebar */}
+            <aside className="hidden lg:block w-64 border-r">
+              <Sidebar
+                activeSection={activeSection}
+                onSectionChange={setActiveSection}
+              />
+            </aside>
 
             {/* Main Content */}
-            <div className="flex-1 flex">
-              {/* Left/Form Panel with Scroll */}
-              <div className="flex-1 lg:max-w-xl border-r">
-                <div className="h-[calc(100vh-4rem)] overflow-y-auto p-6">
-                  {renderActiveSection()}
-                </div>
-              </div>
+            <main className="flex-1 flex flex-col lg:flex-row overflow-hidden">
+              {/* Form Section */}
+              <section className="flex-1 lg:max-w-xl border-r overflow-y-auto p-4">
+                {renderActiveSection()}
+              </section>
 
-              {/* Right/Preview Panel (Sticky & Non-scrollable) */}
-              <div className="hidden lg:block flex-1 bg-muted/30">
-                <div className="sticky top-0 h-[calc(100vh-4rem)] overflow-y-auto border-l p-4">
-                  <ResumePreview />
-                </div>
-              </div>
-            </div>
+              {/* Resume Preview (hide on mobile) */}
+              <aside className="hidden lg:block flex-1 bg-muted/30 border-l overflow-y-auto p-4">
+                <ResumePreview />
+              </aside>
+            </main>
           </div>
         </div>
       </ResumeProvider>
