@@ -1,59 +1,82 @@
-import React, { useState, useEffect } from 'react';
+'use client';
+import React, { useEffect, useState } from 'react';
 import { useResume } from '@/contexts/ResumeContext';
-import { WorkInProgressNotice } from './WorkInProgressNotice';
+import { ResumeScoreCard } from './ResumeScoreCard';
+import { Loader2, WifiOff, ServerCrash } from 'lucide-react';
+
+type ScoreData = {
+  score: number;
+  missing: string[];
+  feedback?: string;
+};
 
 export function TemplateSelectorWithScore() {
   const { resumeData } = useResume();
-  const [score, setScore] = useState<number>(0);
-  const [showWIP, setShowWIP] = useState(true); // Show modal by default (you can toggle as needed)
+  const [scoreData, setScoreData] = useState<ScoreData>({ score: 0, missing: [] });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<'network' | 'server' | null>(null);
 
   useEffect(() => {
-    const result = calculateResumeScore(resumeData);
-    setScore(result);
+    const getScore = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const res = await fetch('http://localhost:8000/score', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ resume: resumeData }),
+        });
+
+        if (!res.ok) {
+          throw new Error('Server error');
+        }
+
+        const data = await res.json();
+        setScoreData({ score: data.score, missing: data.missing || [], feedback: data.feedback });
+      } catch (e: any) {
+        console.error('Score fetch error:', e);
+
+        if (e.message === 'Failed to fetch' || e.name === 'TypeError') {
+          setError('network');
+        } else {
+          setError('server');
+        }
+        setScoreData({ score: 0, missing: [], feedback: '' });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getScore();
   }, [resumeData]);
 
-  // If you want to only show WIP message regardless of score:
   return (
-    <>
-      {showWIP && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
-          <div className="relative">
-            <WorkInProgressNotice />
-            <button
-              onClick={() => setShowWIP(false)}
-              className="absolute top-2 right-2 text-sm px-3 py-1 rounded bg-primary text-white"
-            >
-              Close
-            </button>
-          </div>
+    <div className="p-6 bg-white rounded-xl shadow-lg border max-w-xl mx-auto mt-6 text-center min-h-[300px] flex flex-col justify-center items-center space-y-4">
+      {loading ? (
+        <div className="flex flex-col items-center animate-fade-in text-gray-600">
+          <Loader2 className="w-10 h-10 animate-spin text-blue-500 mb-2" />
+          <p className="text-sm">Analyzing your resume, please wait...</p>
         </div>
-      )}
-      {!showWIP && (
-        <div className="flex items-center justify-center h-64">
-          <WorkInProgressNotice />
+      ) : error === 'network' ? (
+        <div className="flex flex-col items-center text-red-500 animate-fade-in">
+          <WifiOff className="w-10 h-10 mb-2" />
+          <p className="text-lg font-semibold">No Internet Connection</p>
+          <p className="text-sm text-gray-500">Please check your connection and try again.</p>
         </div>
+      ) : error === 'server' ? (
+        <div className="flex flex-col items-center text-yellow-500 animate-fade-in">
+          <ServerCrash className="w-10 h-10 mb-2" />
+          <p className="text-lg font-semibold">Our Servers Are Busy</p>
+          <p className="text-sm text-gray-500">Please try again in a few moments.</p>
+        </div>
+      ) : (
+        <ResumeScoreCard
+          score={scoreData.score}
+          missing={scoreData.missing}
+          feedback={scoreData.feedback || ''}
+        />
       )}
-    </>
+    </div>
   );
-}
-
-// Score calculator (if needed)
-function calculateResumeScore(resumeData: any): number {
-  let score = 0;
-
-  if (resumeData.contact?.name && resumeData.contact?.email) score += 10;
-  if (Array.isArray(resumeData.experience) && resumeData.experience.length > 0) {
-    score += 25;
-    if (resumeData.experience.length >= 3) score += 10;
-  }
-  if (Array.isArray(resumeData.education) && resumeData.education.length > 0) score += 20;
-  if (Array.isArray(resumeData.skills) && resumeData.skills.length > 0) score += 20;
-
-  if (resumeData.selectedTemplate === 'creative' && resumeData.roleType === 'corporate') {
-    score -= 10;
-  } else {
-    score += 5;
-  }
-
-  return Math.max(0, Math.min(score, 100));
 }
