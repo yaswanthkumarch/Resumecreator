@@ -24,11 +24,11 @@ export function TemplateSelector() {
   const filtered = templates.filter(t => t.type === filter);
 
   const handleSelect = (template: typeof templates[0]) => {
-    if (template.type === 'premium') {
-      toast.warning('This is a premium template.', {
-        description: '📩 yaswanthchennareddy25@gmail.com | 📞 7989288815',
-      });
-    }
+    // if (template.type === 'premium') {
+    //   toast.warning('This is a premium template.', {
+    //     description: '📩 yaswanthchennareddy25@gmail.com | 📞 7989288815',
+    //   });
+    // }
     // Allow selecting premium templates but show warning
     dispatch({ type: 'SET_TEMPLATE', payload: template.id });
   };
