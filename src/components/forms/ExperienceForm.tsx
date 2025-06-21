@@ -74,7 +74,7 @@ export function ExperienceForm() {
       const improvedBulletPoints = exp.bulletPoints.map(point => {
         if (point.trim()) {
           // Mock AI improvement - enhance professionalism
-          return `• Enhanced ${point.toLowerCase()} resulting in improved team efficiency and measurable business impact`;
+          return `• Enhanced ${point.toLowerCase()} resulting in improved team efficiency and measurable business impact.`;
         }
         return point;
       });
@@ -90,40 +90,47 @@ export function ExperienceForm() {
   };
 
   return (
-    <div className="overflow-x-auto w-full">
-      <Card className="animate-fade-in min-w-[900px]">
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between">
+    <div className="w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <Card className="animate-fade-in shadow-lg rounded-lg border border-gray-200">
+        <CardHeader className="border-b border-gray-300">
+          <CardTitle className="flex items-center justify-between text-xl font-semibold text-gray-900">
             Work Experience
-            <Button onClick={addExperience} size="sm">
-              <Plus className="h-4 w-4 mr-2" />
+            <Button onClick={addExperience} size="sm" className="flex items-center gap-1 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md shadow-sm">
+              <Plus className="h-4 w-4" />
               Add Experience
             </Button>
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6 min-w-[880px]">
+
+        <CardContent className="space-y-8">
           {experience.length === 0 ? (
-            <p className="text-muted-foreground text-center py-8">
+            <p className="text-muted-foreground text-center py-12 text-lg text-gray-600">
               No work experience entries yet. Click "Add Experience" to get started.
             </p>
           ) : (
             experience.map((exp) => (
-              <div key={exp.id} className="border rounded-lg p-4 space-y-4">
-                <div className="flex justify-between items-start">
-                  <h3 className="font-semibold">Experience Entry</h3>
+              <div
+                key={exp.id}
+                className="border border-gray-300 rounded-lg p-6 bg-white shadow-sm hover:shadow-md transition-shadow duration-300"
+              >
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="font-semibold text-lg text-gray-800">Experience Entry</h3>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => deleteExperience(exp.id)}
-                    className="text-destructive hover:text-destructive"
+                    className="text-red-600 hover:text-red-700"
+                    aria-label="Delete experience entry"
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <Trash2 className="h-5 w-5" />
                   </Button>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
                   <div>
-                    <Label htmlFor={`company-${exp.id}`}>Company *</Label>
+                    <Label htmlFor={`company-${exp.id}`} className="font-medium text-gray-700">
+                      Company <span className="text-red-500">*</span>
+                    </Label>
                     <Input
                       id={`company-${exp.id}`}
                       value={exp.company}
@@ -134,7 +141,9 @@ export function ExperienceForm() {
                   </div>
 
                   <div>
-                    <Label htmlFor={`position-${exp.id}`}>Position *</Label>
+                    <Label htmlFor={`position-${exp.id}`} className="font-medium text-gray-700">
+                      Position <span className="text-red-500">*</span>
+                    </Label>
                     <Input
                       id={`position-${exp.id}`}
                       value={exp.position}
@@ -145,7 +154,9 @@ export function ExperienceForm() {
                   </div>
 
                   <div>
-                    <Label htmlFor={`startDate-${exp.id}`}>Start Date</Label>
+                    <Label htmlFor={`startDate-${exp.id}`} className="font-medium text-gray-700">
+                      Start Date
+                    </Label>
                     <Input
                       id={`startDate-${exp.id}`}
                       type="month"
@@ -156,7 +167,9 @@ export function ExperienceForm() {
                   </div>
 
                   <div>
-                    <Label htmlFor={`endDate-${exp.id}`}>End Date</Label>
+                    <Label htmlFor={`endDate-${exp.id}`} className="font-medium text-gray-700">
+                      End Date
+                    </Label>
                     <Input
                       id={`endDate-${exp.id}`}
                       type="month"
@@ -169,7 +182,7 @@ export function ExperienceForm() {
                   </div>
                 </div>
 
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-3 mb-6">
                   <Checkbox
                     id={`current-${exp.id}`}
                     checked={exp.current}
@@ -180,36 +193,42 @@ export function ExperienceForm() {
                       }
                     }}
                   />
-                  <Label htmlFor={`current-${exp.id}`}>I currently work here</Label>
+                  <Label htmlFor={`current-${exp.id}`} className="font-medium text-gray-700">
+                    I currently work here
+                  </Label>
                 </div>
 
                 <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <Label>Key Achievements & Responsibilities</Label>
-                    <div className="flex gap-2">
+                  <div className="flex items-center justify-between mb-3">
+                    <Label className="font-medium text-gray-700">
+                      Key Achievements & Responsibilities
+                    </Label>
+                    <div className="flex gap-3">
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => improveBulletPoints(exp.id)}
                         disabled={improvingId === exp.id}
+                        className="flex items-center gap-1 border-indigo-600 text-indigo-600 hover:bg-indigo-50 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        <Sparkles className="h-4 w-4 mr-2" />
+                        <Sparkles className="h-4 w-4" />
                         {improvingId === exp.id ? 'Improving...' : 'AI Improve'}
                       </Button>
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => addBulletPoint(exp.id)}
+                        className="flex items-center gap-1 border-green-600 text-green-600 hover:bg-green-50"
                       >
-                        <Plus className="h-4 w-4 mr-2" />
+                        <Plus className="h-4 w-4" />
                         Add Point
                       </Button>
                     </div>
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     {exp.bulletPoints.map((point, index) => (
-                      <div key={index} className="flex items-center gap-2">
+                      <div key={index} className="flex items-center gap-3">
                         <Input
                           value={point}
                           onChange={(e) => updateBulletPoint(exp.id, index, e.target.value)}
@@ -221,9 +240,10 @@ export function ExperienceForm() {
                             variant="ghost"
                             size="sm"
                             onClick={() => removeBulletPoint(exp.id, index)}
-                            className="text-destructive hover:text-destructive"
+                            className="text-red-600 hover:text-red-700"
+                            aria-label="Remove bullet point"
                           >
-                            <Trash2 className="h-4 w-4" />
+                            <Trash2 className="h-5 w-5" />
                           </Button>
                         )}
                       </div>

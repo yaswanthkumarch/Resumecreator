@@ -48,35 +48,40 @@ export function SummaryForm() {
   };
 
   return (
-    <div className="overflow-x-auto w-full">
-      <Card className="animate-fade-in min-w-[900px]">
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between">
+    <div className="w-full max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+      <Card className="animate-fade-in shadow-lg rounded-lg border border-gray-200">
+        <CardHeader className="border-b border-gray-300">
+          <CardTitle className="flex items-center justify-between text-xl font-semibold text-gray-900">
             Professional Summary
             <Button
               variant="outline"
               size="sm"
               onClick={generateAISummary}
               disabled={isGenerating}
-              className="ml-2"
+              className="ml-3 flex items-center"
             >
-              <Sparkles className="h-4 w-4 mr-2" />
+              <Sparkles className="h-4 w-4 mr-1" />
               {isGenerating ? 'Generating...' : 'AI Suggest'}
             </Button>
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="min-w-[880px]">
-            <Label htmlFor="summary">Summary</Label>
+          <div>
+            <Label
+              htmlFor="summary"
+              className="block font-medium text-gray-700 mb-2"
+            >
+              Summary
+            </Label>
             <Textarea
               id="summary"
               value={summary}
               onChange={(e) => handleSummaryChange(e.target.value)}
               placeholder="Write a compelling professional summary that highlights your key strengths and career objectives..."
               rows={6}
-              className="mt-1"
+              className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
             />
-            <p className="text-sm text-muted-foreground mt-2">
+            <p className="text-sm text-gray-500 mt-3">
               Tip: Keep it concise (2-3 sentences) and focus on your unique value proposition.
             </p>
           </div>

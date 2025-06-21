@@ -37,8 +37,8 @@ export function EducationForm() {
   };
 
   return (
-    <div className="overflow-x-auto w-full">
-      <Card className="animate-fade-in min-w-[900px]">
+    <div className="w-full">
+      <Card className="animate-fade-in">
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
             Education
@@ -48,7 +48,8 @@ export function EducationForm() {
             </Button>
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6 min-w-[880px]">
+
+        <CardContent className="space-y-6">
           {education.length === 0 ? (
             <p className="text-muted-foreground text-center py-8">
               No education entries yet. Click "Add Education" to get started.
@@ -57,7 +58,7 @@ export function EducationForm() {
             education.map((edu) => (
               <div key={edu.id} className="border rounded-lg p-4 space-y-4">
                 <div className="flex justify-between items-start">
-                  <h3 className="font-semibold">Education Entry</h3>
+                  <h3 className="font-semibold text-lg">Education Entry</h3>
                   <Button
                     variant="ghost"
                     size="sm"
@@ -67,84 +68,70 @@ export function EducationForm() {
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor={`school-${edu.id}`}>School/University *</Label>
+                    <Label>School / University *</Label>
                     <Input
-                      id={`school-${edu.id}`}
                       value={edu.school}
                       onChange={(e) => updateEducation(edu.id, 'school', e.target.value)}
                       placeholder="University of Example"
-                      className="mt-1"
                     />
                   </div>
-                  
+
                   <div>
-                    <Label htmlFor={`degree-${edu.id}`}>Degree *</Label>
+                    <Label>Degree *</Label>
                     <Input
-                      id={`degree-${edu.id}`}
                       value={edu.degree}
                       onChange={(e) => updateEducation(edu.id, 'degree', e.target.value)}
                       placeholder="Bachelor of Science"
-                      className="mt-1"
                     />
                   </div>
-                  
+
                   <div>
-                    <Label htmlFor={`field-${edu.id}`}>Field of Study</Label>
+                    <Label>Field of Study</Label>
                     <Input
-                      id={`field-${edu.id}`}
                       value={edu.field}
                       onChange={(e) => updateEducation(edu.id, 'field', e.target.value)}
                       placeholder="Computer Science"
-                      className="mt-1"
                     />
                   </div>
-                  
+
                   <div>
-                    <Label htmlFor={`gpa-${edu.id}`}>GPA (Optional)</Label>
+                    <Label>GPA (Optional)</Label>
                     <Input
-                      id={`gpa-${edu.id}`}
                       value={edu.gpa || ''}
                       onChange={(e) => updateEducation(edu.id, 'gpa', e.target.value)}
-                      placeholder="3.8/4.0"
-                      className="mt-1"
+                      placeholder="3.8 / 4.0"
                     />
                   </div>
-                  
+
                   <div>
-                    <Label htmlFor={`startDate-${edu.id}`}>Start Date</Label>
+                    <Label>Start Date</Label>
                     <Input
-                      id={`startDate-${edu.id}`}
                       type="month"
                       value={edu.startDate}
                       onChange={(e) => updateEducation(edu.id, 'startDate', e.target.value)}
-                      className="mt-1"
                     />
                   </div>
-                  
+
                   <div>
-                    <Label htmlFor={`endDate-${edu.id}`}>End Date</Label>
+                    <Label>End Date</Label>
                     <Input
-                      id={`endDate-${edu.id}`}
                       type="month"
                       value={edu.endDate}
                       onChange={(e) => updateEducation(edu.id, 'endDate', e.target.value)}
-                      className="mt-1"
                     />
                   </div>
                 </div>
-                
+
                 <div>
-                  <Label htmlFor={`description-${edu.id}`}>Description (Optional)</Label>
+                  <Label>Description (Optional)</Label>
                   <Textarea
-                    id={`description-${edu.id}`}
                     value={edu.description}
                     onChange={(e) => updateEducation(edu.id, 'description', e.target.value)}
                     placeholder="Relevant coursework, achievements, activities..."
                     rows={3}
-                    className="mt-1"
                   />
                 </div>
               </div>

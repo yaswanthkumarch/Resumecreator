@@ -47,40 +47,46 @@ export function SkillsForm() {
   };
 
   return (
-    <div className="overflow-x-auto w-full">
-      <Card className="animate-fade-in min-w-[1000px]">
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between">
+    <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <Card className="animate-fade-in shadow-lg rounded-lg border border-gray-200">
+        <CardHeader className="border-b border-gray-300">
+          <CardTitle className="flex items-center justify-between text-xl font-semibold text-gray-900">
             Skills
-            <Button onClick={addSkill} size="sm">
-              <Plus className="h-4 w-4 mr-2" />
+            <Button onClick={addSkill} size="sm" className="flex items-center">
+              <Plus className="h-4 w-4 mr-1" />
               Add Skill
             </Button>
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-8">
           {skills.length === 0 ? (
-            <p className="text-muted-foreground text-center py-8">
+            <p className="text-center text-gray-500 py-12">
               No skills added yet. Click "Add Skill" to get started.
             </p>
           ) : (
             skills.map((skill) => (
-              <div key={skill.id} className="border rounded-lg p-4 space-y-4">
-                <div className="flex justify-between items-start">
-                  <h3 className="font-semibold">Skill Entry</h3>
+              <div
+                key={skill.id}
+                className="border rounded-lg p-6 space-y-5 bg-white shadow-sm hover:shadow-md transition-shadow"
+              >
+                <div className="flex justify-between items-center">
+                  <h3 className="font-semibold text-lg text-gray-800">Skill Entry</h3>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => deleteSkill(skill.id)}
-                    className="text-destructive hover:text-destructive"
+                    className="text-red-600 hover:text-red-700"
+                    aria-label="Delete skill"
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <Trash2 className="h-5 w-5" />
                   </Button>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 min-w-[900px]">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <Label htmlFor={`name-${skill.id}`}>Skill Name *</Label>
+                    <Label htmlFor={`name-${skill.id}`} className="font-medium text-gray-700">
+                      Skill Name <span className="text-red-500">*</span>
+                    </Label>
                     <Input
                       id={`name-${skill.id}`}
                       value={skill.name}
@@ -91,12 +97,17 @@ export function SkillsForm() {
                   </div>
 
                   <div>
-                    <Label htmlFor={`category-${skill.id}`}>Category</Label>
+                    <Label
+                      htmlFor={`category-${skill.id}`}
+                      className="font-medium text-gray-700"
+                    >
+                      Category
+                    </Label>
                     <select
                       id={`category-${skill.id}`}
                       value={skill.category}
                       onChange={(e) => updateSkill(skill.id, 'category', e.target.value)}
-                      className="mt-1 w-full px-3 py-2 border border-input rounded-md bg-background text-foreground focus:ring-2 focus:ring-ring focus:border-transparent"
+                      className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
                       {skillCategories.map((category) => (
                         <option key={category} value={category}>
@@ -108,8 +119,11 @@ export function SkillsForm() {
                 </div>
 
                 <div>
-                  <Label htmlFor={`level-${skill.id}`}>
-                    Proficiency Level: {getLevelText(skill.level)} ({skill.level}/5)
+                  <Label
+                    htmlFor={`level-${skill.id}`}
+                    className="font-medium text-gray-700"
+                  >
+                    Proficiency Level: <span className="font-semibold">{getLevelText(skill.level)}</span> ({skill.level}/5)
                   </Label>
                   <div className="mt-2">
                     <Slider
@@ -124,7 +138,7 @@ export function SkillsForm() {
                       className="w-full"
                     />
                   </div>
-                  <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                  <div className="flex justify-between text-xs text-gray-500 mt-1 select-none">
                     <span>Beginner</span>
                     <span>Expert</span>
                   </div>

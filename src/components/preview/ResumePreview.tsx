@@ -13,12 +13,33 @@ import { TwoColumnTemplate } from './templates/TwoColumnTemplate';
 
 const premiumTemplates = ['executive', 'professional'];
 
+function ComingSoonModal({ onClose }: { onClose: () => void }) {
+  return (
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+      <div className="bg-yellow-50 p-8 rounded-lg shadow-lg max-w-sm mx-auto text-center">
+        <h3 className="text-2xl font-bold mb-4 text-yellow-800">🚧 Coming Soon!</h3>
+        <p className="mb-6 text-yellow-900 font-medium">
+          Our company website is currently under development and will be launching soon. Thanks for your patience!
+        </p>
+        <button
+          onClick={onClose}
+          className="bg-yellow-800 hover:bg-yellow-700 text-white px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-yellow-600"
+          aria-label="Close coming soon message"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export function ResumePreview() {
   const { resumeData } = useResume();
   const { selectedTemplate } = resumeData;
 
   const isPremium = premiumTemplates.includes(selectedTemplate);
   const [showMessage, setShowMessage] = useState(false);
+  const [showComingSoon, setShowComingSoon] = useState(false);
 
   const renderTemplate = () => {
     switch (selectedTemplate) {
@@ -67,10 +88,25 @@ export function ResumePreview() {
             <span className="font-bold text-yellow-800">Shiva Technologies</span>. Upgrade your plan to unlock full access.
           </p>
 
+          <p className="mb-6 text-yellow-800 font-semibold">
+            Visit our{' '}
+            <button
+              onClick={() => setShowComingSoon(true)}
+              className="underline hover:text-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-600 rounded font-semibold"
+              aria-label="Show company website coming soon message"
+            >
+              company page
+            </button>{' '}
+            to explore our products and offerings.
+          </p>
+
           <p className="text-sm text-gray-700">
             <button
-              onClick={() => setShowMessage(true)}
-              className="underline font-semibold text-yellow-800 hover:text-yellow-600 transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-600 rounded"
+              onClick={() => !showMessage && setShowMessage(true)}
+              disabled={showMessage}
+              className={`underline font-semibold text-yellow-800 hover:text-yellow-600 transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-600 rounded ${
+                showMessage ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
               aria-label="Contact our team"
             >
               Contact our team
@@ -88,12 +124,28 @@ export function ResumePreview() {
       )}
 
       {showMessage && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50 fade-in">
           <div className="bg-green-100 text-green-800 px-8 py-6 rounded-lg shadow-lg text-lg font-medium max-w-sm text-center">
             ✅ Our team is currently working on this. Thank you for staying with us!
           </div>
         </div>
       )}
+
+      {showComingSoon && <ComingSoonModal onClose={() => setShowComingSoon(false)} />}
+
+      <style jsx>{`
+        .fade-in {
+          animation: fadeIn 0.3s ease forwards;
+        }
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+      `}</style>
     </div>
   );
 }

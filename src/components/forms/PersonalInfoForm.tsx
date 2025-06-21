@@ -17,16 +17,20 @@ export function PersonalInfoForm() {
   };
 
   return (
-    <div className="overflow-x-auto w-full">
-      <Card className="animate-fade-in min-w-[1000px]">
-        <CardHeader>
-          <CardTitle>Personal Information</CardTitle>
+    <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <Card className="animate-fade-in shadow-lg rounded-lg border border-gray-200">
+        <CardHeader className="border-b border-gray-300">
+          <CardTitle className="text-xl font-semibold text-gray-900">
+            Personal Information
+          </CardTitle>
         </CardHeader>
 
-        <CardContent className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 min-w-[900px]">
+        <CardContent className="space-y-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div>
-              <Label htmlFor="fullName">Full Name *</Label>
+              <Label htmlFor="fullName" className="font-medium text-gray-700">
+                Full Name <span className="text-red-500">*</span>
+              </Label>
               <Input
                 id="fullName"
                 value={personalInfo.fullName}
@@ -37,7 +41,9 @@ export function PersonalInfoForm() {
             </div>
 
             <div>
-              <Label htmlFor="email">Email *</Label>
+              <Label htmlFor="email" className="font-medium text-gray-700">
+                Email <span className="text-red-500">*</span>
+              </Label>
               <Input
                 id="email"
                 type="email"
@@ -49,7 +55,9 @@ export function PersonalInfoForm() {
             </div>
 
             <div>
-              <Label htmlFor="phone">Phone Number</Label>
+              <Label htmlFor="phone" className="font-medium text-gray-700">
+                Phone Number
+              </Label>
               <Input
                 id="phone"
                 value={personalInfo.phone}
@@ -60,7 +68,9 @@ export function PersonalInfoForm() {
             </div>
 
             <div>
-              <Label htmlFor="linkedin">LinkedIn</Label>
+              <Label htmlFor="linkedin" className="font-medium text-gray-700">
+                LinkedIn
+              </Label>
               <Input
                 id="linkedin"
                 value={personalInfo.linkedin}
@@ -71,7 +81,9 @@ export function PersonalInfoForm() {
             </div>
 
             <div>
-              <Label htmlFor="github">GitHub</Label>
+              <Label htmlFor="github" className="font-medium text-gray-700">
+                GitHub
+              </Label>
               <Input
                 id="github"
                 value={personalInfo.github}
@@ -82,7 +94,9 @@ export function PersonalInfoForm() {
             </div>
 
             <div>
-              <Label htmlFor="portfolio">Portfolio/Website</Label>
+              <Label htmlFor="portfolio" className="font-medium text-gray-700">
+                Portfolio / Website
+              </Label>
               <Input
                 id="portfolio"
                 value={personalInfo.portfolio}
@@ -94,14 +108,16 @@ export function PersonalInfoForm() {
           </div>
 
           <div>
-            <Label htmlFor="address">Address</Label>
+            <Label htmlFor="address" className="font-medium text-gray-700">
+              Address
+            </Label>
             <Textarea
               id="address"
               value={personalInfo.address}
               onChange={(e) => handleChange('address', e.target.value)}
               placeholder="City, State, Country"
               rows={2}
-              className="mt-1"
+              className="mt-1 resize-none"
             />
           </div>
         </CardContent>
