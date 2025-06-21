@@ -41,7 +41,8 @@ export function MobileSidebar({ activeSection, onSectionChange }: MobileSidebarP
   };
 
   return (
-    <div className="relative w-full min-h-screen bg-gray-50 lg:hidden">
+   <div className="relative w-full min-h-[1px] bg-gray-50 lg:hidden">
+
       {/* Sidebar toggle button */}
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetTrigger asChild>
