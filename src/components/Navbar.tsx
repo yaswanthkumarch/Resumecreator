@@ -43,10 +43,28 @@ export function Navbar() {
   return (
     <nav className="sticky top-0 z-50 w-full border-b bg-white backdrop-blur-sm shadow-sm">
       <div className="container mx-auto flex h-16 items-center justify-between px-4 sm:px-6">
-        <div className="flex items-center space-x-3 cursor-default select-none">
-          <FileText className="h-8 w-8 text-indigo-600" />
-          <h1 className="text-xl sm:text-2xl font-bold text-indigo-700">ResumeLoom</h1>
-        </div>
+        <div className="flex flex-col items-start space-y-1 cursor-default select-none">
+  <div className="flex items-center space-x-3">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      className="h-8 w-8 text-indigo-600"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+    >
+      <rect x="3" y="4" width="14" height="16" rx="2" ry="2" />
+      <line x1="7" y1="8" x2="13" y2="8" />
+      <line x1="7" y1="12" x2="13" y2="12" />
+      <polyline points="9 16 11 18 15 14" />
+    </svg>
+    <h1 className="text-xl sm:text-2xl font-bold text-indigo-700">
+      Siva Resume Builder
+    </h1>
+  </div>
+  <p className="text-sm text-indigo-500 ml-11">Smart Resumes for Smarter Careers.</p>
+</div>
+
 
         <div className="flex items-center space-x-2">
           {/* Mobile buttons */}
