@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useResume } from '@/contexts/ResumeContext';
 import { cn } from '@/lib/utils';
 import { CheckCircle2, Lock } from 'lucide-react';
@@ -21,15 +21,16 @@ export function TemplateSelector() {
   const { selectedTemplate } = resumeData;
   const [filter, setFilter] = useState<'free' | 'premium'>('free');
 
+  // Set default selected template to 'classic' if none selected
+  useEffect(() => {
+    if (!selectedTemplate) {
+      dispatch({ type: 'SET_TEMPLATE', payload: 'classic' });
+    }
+  }, [selectedTemplate, dispatch]);
+
   const filtered = templates.filter(t => t.type === filter);
 
   const handleSelect = (template: typeof templates[0]) => {
-    // if (template.type === 'premium') {
-    //   toast.warning('This is a premium template.', {
-    //     description: '📩 yaswanthchennareddy25@gmail.com | 📞 7989288815',
-    //   });
-    // }
-    // Allow selecting premium templates but show warning
     dispatch({ type: 'SET_TEMPLATE', payload: template.id });
   };
 
