@@ -1,24 +1,35 @@
-import React, { useRef } from 'react';
-import { ResumeData } from '@/contexts/ResumeContext';
+import React, { useRef, useState } from 'react';
 import html2pdf from 'html2pdf.js';
+import { ResumeData } from '@/contexts/ResumeContext';
 
-interface ClassicTemplateProps {
+interface ModernElegantTemplateProps {
   data: ResumeData;
 }
 
-export function ClassicTemplate({ data }: ClassicTemplateProps) {
-  const { personalInfo, summary, education, experience, skills, projects } = data;
+export function ClassicTemplate({ data }: ModernElegantTemplateProps) {
   const resumeRef = useRef<HTMLDivElement>(null);
+  const { personalInfo, summary, education, experience, skills, projects } = data;
+
+  const [showColorPicker, setShowColorPicker] = useState(false);
+  const [textColor, setTextColor] = useState('#334155'); // default text color (slate-700)
+  const [headingColor, setHeadingColor] = useState('#4f46e5'); // default heading color (indigo-700)
+  const [backgroundColor, setBackgroundColor] = useState('#ffffff'); // default background white
 
   const formatDate = (d?: string) =>
     d ? new Date(d + '-01').toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : '';
 
-  const skillsByCategory = skills.reduce((a, s) => {
-    (a[s.category] ||= []).push(s);
-    return a;
+  const skillsByCategory = skills.reduce((acc, skill) => {
+    (acc[skill.category] ||= []).push(skill);
+    return acc;
   }, {} as Record<string, typeof skills>);
 
-  const downloadPdf = () => {
+  const handleDownloadClick = () => {
+    setShowColorPicker(true);
+  };
+
+  const handleConfirmColors = () => {
+    setShowColorPicker(false);
+
     if (!resumeRef.current) return;
 
     html2pdf()
@@ -31,316 +42,340 @@ export function ClassicTemplate({ data }: ClassicTemplateProps) {
         pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
       })
       .from(resumeRef.current)
-      .toPdf()
-      .get('pdf')
-      .then((pdf: any) => {
-        pdf.save();
-      });
+      .save();
   };
 
+  const ColorPickerModal = () => (
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+      <div className="bg-white rounded-lg p-6 w-96 shadow-lg">
+        <h2 className="text-xl font-semibold mb-4">Choose Colors Before Download</h2>
+
+        <div className="mb-4">
+          <label htmlFor="backgroundColor" className="block font-medium mb-1">
+            Background Color
+          </label>
+          <input
+            type="color"
+            id="backgroundColor"
+            value={backgroundColor}
+            onChange={(e) => setBackgroundColor(e.target.value)}
+            className="w-16 h-10 cursor-pointer rounded border border-gray-300"
+          />
+        </div>
+
+        <div className="mb-4">
+          <label htmlFor="textColor" className="block font-medium mb-1">
+            Text Color
+          </label>
+          <input
+            type="color"
+            id="textColor"
+            value={textColor}
+            onChange={(e) => setTextColor(e.target.value)}
+            className="w-16 h-10 cursor-pointer rounded border border-gray-300"
+          />
+        </div>
+
+        <div className="mb-6">
+          <label htmlFor="headingColor" className="block font-medium mb-1">
+            Heading Color
+          </label>
+          <input
+            type="color"
+            id="headingColor"
+            value={headingColor}
+            onChange={(e) => setHeadingColor(e.target.value)}
+            className="w-16 h-10 cursor-pointer rounded border border-gray-300"
+          />
+        </div>
+
+        <div className="flex justify-end gap-3">
+          <button
+            onClick={() => setShowColorPicker(false)}
+            className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleConfirmColors}
+            className="px-4 py-2 bg-indigo-700 text-white rounded hover:bg-indigo-800"
+          >
+            Download PDF
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
-    <div className="bg-gray-50 min-h-screen p-8 flex flex-col items-center">
-      <style>
-        {`
-          .resume-container {
-            width: 595pt; /* A4 width */
-            font-family: 'Inter', sans-serif;
-            font-size: 10px;
-            line-height: 1.15;
-            color: #1e293b; /* cool dark slate */
-            background: white;
-            padding: 24pt 28pt;
-            box-sizing: border-box;
-            border-radius: 16pt;
-            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
-            display: flex;
-            gap: 20pt;
-            max-width: 100%;
-          }
+    <div
+        id="compact-template-root"
+        className="max-h-[85vh] overflow-auto p-10 bg-white text-gray-900 text-base min-w-[820px] shadow-xl rounded-2xl border border-gray-300"
+        style={{ boxShadow: '0 20px 45px rgba(99, 102, 241, 0.15)' }}
+      >
+      {showColorPicker && <ColorPickerModal />}
 
-          .sidebar {
-            width: 32%;
-            display: flex;
-            flex-direction: column;
-            gap: 20pt;
-            padding-right: 16pt;
-            border-right: 2px solid #cbd5e1;
-          }
+      <div
+        ref={resumeRef}
+        className="shadow-lg rounded-lg w-[800px] max-w-full p-10"
+        style={{ backgroundColor, color: textColor }}
+      >
+        {/* Header */}
+        <header
+          className="border-b border-slate-300 pb-6 mb-10 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2"
+          style={{ color: headingColor }}
+        >
+          <div>
+            <h1 className="text-4xl font-extrabold tracking-widest leading-tight" style={{ color: headingColor }}>
+              {personalInfo.fullName || 'Your Name'}
+            </h1>
+            <p className="mt-2 text-sm max-w-md" style={{ color: textColor }}>
+              {personalInfo.email && <span>{personalInfo.email} &nbsp;&middot;&nbsp; </span>}
+              {personalInfo.phone && <span>{personalInfo.phone} &nbsp;&middot;&nbsp; </span>}
+              {personalInfo.linkedin && (
+                <a
+      href={personalInfo.linkedin}
+      target="_blank"
+      rel="noopener noreferrer"
+      style={{ color: textColor, textDecoration: 'none' }}
+                >
+                  LinkedIn
+                </a>
+              )}
+              {personalInfo.github && (
+                <>
+                  &nbsp;&middot;&nbsp;
+                  <a
+        href={personalInfo.github}
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{ color: textColor, textDecoration: 'none' }}
+      >
+                    GitHub
+                  </a>
+                </>
+              )}
+            </p>
+          </div>
+        </header>
 
-          .content {
-            width: 68%;
-            display: flex;
-            flex-direction: column;
-            gap: 28pt;
-          }
+        {/* Summary */}
+        {summary && (
+          <section className="mb-10 resume-section">
+            <h2 className="font-bold uppercase text-sm mb-3 tracking-widest" style={{ color: headingColor }}>
+              Profile Summary
+            </h2>
+            <p className="text-base leading-relaxed max-w-3xl" style={{ color: textColor }}>
+              {summary}
+            </p>
+          </section>
+        )}
 
-          /* Headings */
-          h1 {
-            font-size: 26px;
-            font-weight: 900;
-            color: #4338ca;
-            letter-spacing: 0.1em;
-            margin-bottom: 6px;
-            user-select: none;
-          }
-
-          h2.section-title {
-            font-weight: 800;
-            font-size: 14px;
-            color: #3730a3;
-            text-transform: uppercase;
-            border-left: 5px solid #6366f1;
-            padding-left: 10px;
-            margin-bottom: 12px;
-            letter-spacing: 0.12em;
-          }
-
-          h3 {
-            font-size: 12px;
-            font-weight: 700;
-            color: #1e293b;
-            margin: 0 0 4px 0;
-          }
-
-          p, span, li {
-            font-size: 10px;
-            line-height: 1.15;
-            color: #334155;
-          }
-
-          /* Contact info */
-          .contact-info span {
-            display: block;
-            margin-bottom: 5px;
-            color: #64748b;
-            font-weight: 600;
-          }
-
-          /* Lists */
-          ul {
-            margin: 0;
-            padding-left: 18px;
-            list-style-type: disc;
-          }
-
-          ul li {
-            margin-bottom: 7px;
-          }
-
-          /* Skill badges */
-          .skill-badge {
-            display: inline-block;
-            background: #e0e7ff;
-            color: #4338ca;
-            font-weight: 700;
-            font-size: 9px;
-            padding: 5px 12px;
-            border-radius: 9999px;
-            margin: 4px 6px 4px 0;
-            box-shadow: 0 2px 6px rgb(99 102 241 / 0.3);
-            user-select: none;
-            cursor: default;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-          }
-          .skill-badge:hover {
-            background-color: #c7d2fe;
-            transform: scale(1.05);
-          }
-
-          /* Tech badges */
-          .tech-badge {
-            display: inline-block;
-            background: #f1f5f9;
-            color: #475569;
-            font-weight: 600;
-            font-size: 8.5px;
-            padding: 4px 9px;
-            border-radius: 9999px;
-            margin: 3px 5px 3px 0;
-            user-select: none;
-            cursor: default;
-            transition: background-color 0.25s ease;
-          }
-          .tech-badge:hover {
-            background-color: #e2e8f0;
-          }
-
-          /* Links */
-          a {
-            color: #4338ca;
-            font-weight: 600;
-            text-decoration: none;
-            transition: color 0.3s ease;
-          }
-          a:hover {
-            color: #312e81;
-            text-decoration: underline;
-          }
-
-          /* Avoid breaking inside sections */
-          .resume-section,
-          .resume-section ul,
-          .resume-section li {
-            page-break-inside: avoid;
-            break-inside: avoid;
-          }
-
-          /* Download button below content */
-          .download-btn {
-            margin-top: 30px;
-            padding: 12px 32px;
-            font-size: 14px;
-            font-weight: 700;
-            background: #4338ca;
-            color: white;
-            border-radius: 9999px;
-            box-shadow: 0 8px 16px rgba(67, 56, 202, 0.35);
-            border: none;
-            cursor: pointer;
-            user-select: none;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-          }
-          .download-btn:hover {
-            background: #312e81;
-            transform: translateY(-2px);
-          }
-          .download-btn:active {
-            transform: translateY(0);
-          }
-        `}
-      </style>
-
-      {/* Resume Container */}
-      <div ref={resumeRef} className="resume-container">
-        {/* Sidebar */}
-        <aside className="sidebar">
-          <header>
-            <h1>{personalInfo.fullName || 'Your Name'}</h1>
-            <div className="contact-info" aria-label="Contact Information">
-              {personalInfo.email && <span>Email: {personalInfo.email}</span>}
-              {personalInfo.phone && <span>Phone: {personalInfo.phone}</span>}
-              {personalInfo.linkedin && <span>LinkedIn: {personalInfo.linkedin}</span>}
-              {personalInfo.address && <span>Address: {personalInfo.address}</span>}
+        {/* Experience */}
+        <section className="mb-10 resume-section">
+          <h2 className="font-bold uppercase text-sm mb-5 tracking-widest" style={{ color: headingColor }}>
+            Experience
+          </h2>
+          {experience.map((e) => (
+            <div key={e.id} className="mb-8 last:mb-0">
+              <div className="flex justify-between items-center mb-1">
+                <h3 className="font-semibold text-lg" style={{ color: headingColor }}>
+                  {e.position}
+                </h3>
+                <span className="text-xs font-mono" style={{ color: textColor }}>
+                  {formatDate(e.startDate)} – {e.current ? 'Present' : formatDate(e.endDate)}
+                </span>
+              </div>
+              <p className="italic text-indigo-600 text-sm mb-3" style={{ color: headingColor }}>
+                {e.company}
+              </p>
+              <ul className="list-disc pl-5 text-sm space-y-1" style={{ color: textColor }}>
+                {e.bulletPoints.slice(0, 3).map((pt, i) => (
+                  <li key={i}>{pt}</li>
+                ))}
+              </ul>
             </div>
-          </header>
+          ))}
+        </section>
 
-          {summary && (
-            <section className="resume-section" aria-label="Summary Section">
-              <h2 className="section-title">Summary</h2>
-              <p>{summary}</p>
-            </section>
-          )}
+        {/* Education */}
+        <section className="mb-10 resume-section">
+          <h2 className="font-bold uppercase text-sm mb-5 tracking-widest" style={{ color: headingColor }}>
+            Education
+          </h2>
+          {education.map((ed) => (
+            <div key={ed.id} className="mb-6 last:mb-0">
+              <div className="flex justify-between items-center mb-1">
+                <h3 className="font-semibold text-lg" style={{ color: headingColor }}>
+                  {ed.degree}
+                  {ed.field && `, ${ed.field}`}
+                </h3>
+                <span className="text-xs font-mono" style={{ color: textColor }}>
+                  {formatDate(ed.startDate)} – {formatDate(ed.endDate)}
+                </span>
+              </div>
+              <p className="italic text-indigo-600 text-sm" style={{ color: headingColor }}>
+                {ed.school}
+              </p>
+              {ed.gpa && (
+                <p className="text-xs mt-1" style={{ color: textColor }}>
+                  GPA: {ed.gpa}
+                </p>
+              )}
+            </div>
+          ))}
+        </section>
 
-          <section className="resume-section" aria-label="Skills Section">
-            <h2 className="section-title">Skills</h2>
-            {Object.entries(skillsByCategory).map(([cat, arr]) => (
-              <div key={cat} style={{ marginBottom: '16px' }}>
-                <h3>{cat}</h3>
-                <div>
-                  {arr.map((s) => (
-                    <span key={s.id} className="skill-badge">
-                      {s.name}
+        {/* Projects */}
+        <section className="mb-10 resume-section">
+          <h2 className="font-bold uppercase text-sm mb-5 tracking-widest" style={{ color: headingColor }}>
+            Projects
+          </h2>
+          {projects.map((p) => (
+            <div key={p.id} className="mb-8 last:mb-0">
+              <div className="flex justify-between items-center mb-1">
+                <h3 className="font-semibold text-lg" style={{ color: headingColor }}>
+                  {p.title}
+                </h3>
+                <span className="text-xs font-mono" style={{ color: textColor }}>
+                  {formatDate(p.startDate)} – {formatDate(p.endDate)}
+                </span>
+              </div>
+              <p className="text-sm leading-relaxed" style={{ color: textColor }}>
+                {p.description}
+              </p>
+              {p.technologies.length > 0 && (
+                <div className="flex flex-wrap mt-4 gap-3">
+                  {p.technologies.map((tech, idx) => (
+                    <span key={idx} className="tech-badge" style={{ color: textColor, backgroundColor: '#e2e8f0' }}>
+                      {tech}
                     </span>
                   ))}
                 </div>
-              </div>
-            ))}
-          </section>
-        </aside>
-
-        {/* Main content */}
-        <main className="content">
-          {/* Experience */}
-          <section className="resume-section" aria-label="Experience Section">
-            <h2 className="section-title">Experience</h2>
-            <ul>
-              {experience.map((e) => (
-                <li key={e.id} style={{ marginBottom: '14px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                    <h3>{e.position}</h3>
-                    <span style={{ color: '#64748b', fontSize: '9px' }}>
-                      {formatDate(e.startDate)} – {e.current ? 'Present' : formatDate(e.endDate)}
-                    </span>
-                  </div>
-                  <p style={{ fontStyle: 'italic', color: '#6366f1', marginBottom: '8px' }}>{e.company}</p>
-                  <ul>
-                    {e.bulletPoints.slice(0, 3).map((pt, i) => (
-                      <li key={i}>{pt}</li>
-                    ))}
-                  </ul>
-                </li>
-              ))}
-            </ul>
-          </section>
-
-          {/* Education */}
-          <section className="resume-section" aria-label="Education Section">
-            <h2 className="section-title">Education</h2>
-            <ul>
-              {education.map((ed) => (
-                <li key={ed.id} style={{ marginBottom: '14px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                    <h3>
-                      {ed.degree}
-                      {ed.field ? `, ${ed.field}` : ''}
-                    </h3>
-                    <span style={{ color: '#64748b', fontSize: '9px' }}>
-                      {formatDate(ed.startDate)} – {formatDate(ed.endDate)}
-                    </span>
-                  </div>
-                  <p style={{ fontStyle: 'italic', color: '#6366f1', marginBottom: '6px' }}>{ed.school}</p>
-                  {ed.gpa && <p style={{ fontWeight: '600', color: '#475569' }}>GPA: {ed.gpa}</p>}
-                  {ed.description && <p style={{ fontStyle: 'italic', color: '#475569' }}>{ed.description}</p>}
-                </li>
-              ))}
-            </ul>
-          </section>
-
-          {/* Projects */}
-          <section className="resume-section" aria-label="Projects Section">
-            <h2 className="section-title">Projects</h2>
-            <ul>
-              {projects.map((p) => (
-                <li key={p.id} style={{ marginBottom: '16px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                    <h3>{p.title}</h3>
-                    <span style={{ color: '#64748b', fontSize: '9px' }}>
-                      {formatDate(p.startDate)} – {formatDate(p.endDate)}
-                    </span>
-                  </div>
-                  <p>{p.description}</p>
-                  {p.technologies.length > 0 && (
-                    <div style={{ marginTop: '6px' }}>
-                      {p.technologies.map((t, i) => (
-                        <span key={i} className="tech-badge">
-                          {t}
-                        </span>
-                      ))}
-                    </div>
+              )}
+              {(p.link || p.github) && (
+                <div className="mt-3 text-xs flex gap-5">
+                  {p.link && (
+                    <a
+                      href={p.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    style={{ color: textColor, textDecoration: 'none' }}
+                    >
+                      Live Demo
+                    </a>
                   )}
-                  <div style={{ marginTop: '8px', fontSize: '9px' }}>
-                    {p.link && (
-                      <a href={p.link} target="_blank" rel="noopener noreferrer" style={{ marginRight: '14px' }}>
-                        Demo
-                      </a>
-                    )}
-                    {p.github && (
-                      <a href={p.github} target="_blank" rel="noopener noreferrer">
-                        Code
-                      </a>
-                    )}
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </section>
-        </main>
+                  {p.github && (
+                    <a
+        href={p.github}
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{ color: textColor, textDecoration: 'none' }}
+      >
+                      GitHub
+                    </a>
+                  )}
+                </div>
+              )}
+            </div>
+          ))}
+        </section>
+
+        {/* Skills */}
+        <section className="resume-section">
+          <h2 className="font-bold uppercase text-sm mb-5 tracking-widest" style={{ color: headingColor }}>
+            Skills
+          </h2>
+          {Object.entries(skillsByCategory).map(([category, items]) => (
+            <div key={category} className="mb-5">
+              <h4 className="text-sm font-semibold mb-3" style={{ color: headingColor }}>
+                {category}
+              </h4>
+              <div className="flex flex-wrap gap-4">
+                {items.map((skill) => (
+                  <span
+                    key={skill.id}
+                    className="skill-badge"
+                    style={{
+                      color: '#fff',
+                      background: `linear-gradient(135deg, ${headingColor}, ${textColor})`,
+                      boxShadow: `0 4px 8px ${headingColor}66`,
+                    }}
+                  >
+                    {skill.name}
+                  </span>
+                ))}
+              </div>
+            </div>
+          ))}
+        </section>
       </div>
 
-      {/* Download PDF Button */}
-      <button onClick={downloadPdf} className="download-btn" aria-label="Download Resume as PDF">
-        Download Resume (PDF)
+      <button
+        onClick={handleDownloadClick}
+        className="mt-8 px-8 py-3 bg-indigo-700 hover:bg-indigo-800 text-white text-base font-semibold rounded-full shadow-lg transition-transform duration-200 ease-in-out"
+      >
+        Download as PDF
       </button>
+
+      <style>
+        {`
+          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+
+          ul {
+            list-style-type: disc;
+            margin-left: 1.25rem;
+            padding-left: 0;
+          }
+
+          .skill-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 7px 16px;
+            border-radius: 9999px;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            white-space: nowrap;
+            user-select: none;
+            cursor: default;
+          }
+          .skill-badge:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+          }
+
+          .tech-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 6px 14px;
+            border-radius: 9999px;
+            box-shadow: inset 0 0 1px #cbd5e1, 0 2px 6px rgba(0, 0, 0, 0.08);
+            transition: background 0.3s ease;
+            user-select: none;
+          }
+          .tech-badge:hover {
+            background: #cbd5e1;
+          }
+
+          .resume-section {
+            page-break-inside: avoid;
+            break-inside: avoid;
+            margin-top: 3px;
+          }
+
+          a {
+            text-decoration: none;
+          }
+          a:hover {
+            text-decoration: underline;
+          }
+        `}
+      </style>
     </div>
   );
 }

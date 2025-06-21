@@ -1,282 +1,375 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
+import html2pdf from 'html2pdf.js';
 import { ResumeData } from '@/contexts/ResumeContext';
-import { Mail, Phone, Link, MapPin, ExternalLink } from 'lucide-react';
 
-interface MinimalistTemplateProps {
+interface ModernElegantTemplateProps {
   data: ResumeData;
 }
 
-export function MinimalistTemplate({ data }: MinimalistTemplateProps) {
+export function MinimalistTemplate({ data }: ModernElegantTemplateProps) {
+  const resumeRef = useRef<HTMLDivElement>(null);
   const { personalInfo, summary, education, experience, skills, projects } = data;
 
-  const formatDate = (dateString?: string) => {
-    if (!dateString) return '';
-    const date = new Date(dateString + '-01');
-    return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
-  };
+  const [showColorPicker, setShowColorPicker] = useState(false);
+  const [textColor, setTextColor] = useState('#334155'); // slate-700
+  const [headingColor, setHeadingColor] = useState('#4f46e5'); // indigo-700
+  const [backgroundColor, setBackgroundColor] = useState('#ffffff');
+
+  const formatDate = (d?: string) =>
+    d ? new Date(d + '-01').toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : '';
 
   const skillsByCategory = skills.reduce((acc, skill) => {
-    if (!acc[skill.category]) acc[skill.category] = [];
-    acc[skill.category].push(skill);
+    (acc[skill.category] ||= []).push(skill);
     return acc;
   }, {} as Record<string, typeof skills>);
 
-  return (
-    <div className="max-w-5xl mx-auto p-14 bg-gradient-to-tr from-indigo-50 via-white to-indigo-50 text-gray-900 font-sans shadow-2xl rounded-xl border border-indigo-300 relative overflow-hidden">
-      
-      {/* Subtle abstract shape */}
-      <svg
-        className="absolute top-[-100px] right-[-100px] w-72 h-72 opacity-10"
-        viewBox="0 0 200 200"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <defs>
-          <radialGradient id="grad" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#6366f1" stopOpacity="0.3" />
-            <stop offset="100%" stopColor="#6366f1" stopOpacity="0" />
-          </radialGradient>
-        </defs>
-        <circle cx="100" cy="100" r="100" fill="url(#grad)" />
-      </svg>
+  const handleDownloadClick = () => {
+    setShowColorPicker(true);
+  };
 
-      {/* Header */}
-      <header className="mb-16 border-b border-indigo-400 pb-6 text-center relative z-10">
-        <h1 className="text-6xl font-serif font-extrabold tracking-tight text-indigo-700 mb-4 underline-animation">
-          {personalInfo.fullName || 'Your Name'}
-        </h1>
-        <div className="flex flex-wrap justify-center gap-12 text-gray-600 text-sm font-light">
-          {personalInfo.email && (
-            <a
-              href={`mailto:${personalInfo.email}`}
-              className="flex items-center gap-2 hover:text-indigo-600 transition-colors cursor-pointer"
-              aria-label="Email"
-            >
-              <Mail className="w-6 h-6" />
-              {personalInfo.email}
-            </a>
-          )}
-          {personalInfo.phone && (
-            <div className="flex items-center gap-2">
-              <Phone className="w-6 h-6" />
-              {personalInfo.phone}
-            </div>
-          )}
-          {personalInfo.linkedin && (
-            <a
-              href={personalInfo.linkedin}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 hover:text-indigo-600 transition-colors cursor-pointer underline-animation"
-              aria-label="LinkedIn"
-            >
-              <Link className="w-6 h-6" />
-              LinkedIn
-            </a>
-          )}
-          {personalInfo.address && (
-            <div className="flex items-center gap-2">
-              <MapPin className="w-6 h-6" />
-              {personalInfo.address}
-            </div>
-          )}
-        </div>
-      </header>
+  const handleConfirmColors = () => {
+    setShowColorPicker(false);
+    if (!resumeRef.current) return;
 
-      {/* Summary */}
-      {summary && (
-        <section className="mb-16 max-w-4xl mx-auto relative z-10">
-          <p className="text-xl text-gray-700 font-light leading-relaxed italic border-l-8 border-indigo-400 pl-6 shadow-sm bg-indigo-50 rounded-lg py-4">
-            {summary}
-          </p>
-        </section>
-      )}
+    html2pdf()
+      .set({
+        margin: 10,
+        filename: `${personalInfo.fullName || 'resume'}.pdf`,
+        image: { type: 'jpeg', quality: 1 },
+        html2canvas: { scale: 3, scrollY: -window.scrollY },
+        jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' },
+        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
+      })
+      .from(resumeRef.current)
+      .save();
+  };
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-20 relative z-10">
-        {/* Left Column: Experience + Projects */}
-        <div className="space-y-20">
-          {/* Experience */}
-          {experience.length > 0 && (
-            <section>
-              <SectionTitle>Experience</SectionTitle>
-              <div className="relative border-l-2 border-indigo-300 ml-4 pl-8 space-y-12">
-                {experience.map((exp) => (
-                  <TimelineItem key={exp.id} title={exp.position} subtitle={exp.company} startDate={exp.startDate} endDate={exp.endDate} current={exp.current} >
-                    {exp.bulletPoints.filter(pt => pt.trim()).map((point, i) => (
-                      <li key={i} className="leading-relaxed text-gray-700 list-disc list-inside font-light">
-                        {point}
-                      </li>
-                    ))}
-                  </TimelineItem>
-                ))}
-              </div>
-            </section>
-          )}
+  const ColorPickerModal = () => (
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50">
+      <div className="bg-white rounded-lg p-6 w-96 shadow-xl">
+        <h2 className="text-2xl font-semibold mb-5 text-center">Choose Colors Before Download</h2>
 
-          {/* Projects */}
-          {projects.length > 0 && (
-            <section>
-              <SectionTitle>Projects</SectionTitle>
-              <div className="relative border-l-2 border-indigo-300 ml-4 pl-8 space-y-12">
-                {projects.map((project) => (
-                  <TimelineItem key={project.id} title={project.title} startDate={project.startDate} endDate={project.endDate}>
-                    <p className="text-gray-700 font-light mb-3">{project.description}</p>
-                    <div className="flex flex-wrap gap-3 mb-4">
-                      {project.technologies.map((tech, i) => (
-                        <span
-                          key={i}
-                          className="text-indigo-700 bg-indigo-100 rounded-full px-3 py-1 text-xs font-semibold transition-transform hover:scale-110"
-                        >
-                          {tech}
-                        </span>
-                      ))}
-                    </div>
-                    <div className="flex gap-6 text-indigo-600 font-medium text-sm">
-                      {project.link && (
-                        <a
-                          href={project.link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 hover:underline hover:text-indigo-800 transition-colors"
-                        >
-                          Live Demo <ExternalLink className="w-4 h-4" />
-                        </a>
-                      )}
-                      {project.github && (
-                        <a
-                          href={project.github}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 hover:underline hover:text-indigo-800 transition-colors"
-                        >
-                          GitHub <ExternalLink className="w-4 h-4" />
-                        </a>
-                      )}
-                    </div>
-                  </TimelineItem>
-                ))}
-              </div>
-            </section>
-          )}
+        <div className="mb-4 flex items-center justify-between">
+          <label htmlFor="backgroundColor" className="font-medium">Background Color</label>
+          <input
+            type="color"
+            id="backgroundColor"
+            value={backgroundColor}
+            onChange={(e) => setBackgroundColor(e.target.value)}
+            className="w-14 h-10 rounded cursor-pointer border border-gray-300"
+          />
         </div>
 
-        {/* Right Column: Education + Skills */}
-        <div className="space-y-20">
-          {/* Education */}
-          {education.length > 0 && (
-            <section>
-              <SectionTitle>Education</SectionTitle>
-              <div className="relative border-l-2 border-indigo-300 ml-4 pl-8 space-y-12">
-                {education.map((edu) => (
-                  <TimelineItem
-                    key={edu.id}
-                    title={`${edu.degree} ${edu.field ? `in ${edu.field}` : ''}`}
-                    subtitle={edu.school}
-                    startDate={edu.startDate}
-                    endDate={edu.endDate}
-                  >
-                    {edu.gpa && <p className="text-sm text-gray-500 mt-1 font-mono">GPA: {edu.gpa}</p>}
-                    {edu.description && (
-                      <p className="text-gray-700 font-light leading-relaxed mt-2">{edu.description}</p>
-                    )}
-                  </TimelineItem>
-                ))}
-              </div>
-            </section>
-          )}
+        <div className="mb-4 flex items-center justify-between">
+          <label htmlFor="textColor" className="font-medium">Text Color</label>
+          <input
+            type="color"
+            id="textColor"
+            value={textColor}
+            onChange={(e) => setTextColor(e.target.value)}
+            className="w-14 h-10 rounded cursor-pointer border border-gray-300"
+          />
+        </div>
 
-          {/* Skills */}
-          {skills.length > 0 && (
-            <section>
-              <SectionTitle>Skills</SectionTitle>
-              <div className="space-y-10">
-                {Object.entries(skillsByCategory).map(([category, categorySkills]) => (
-                  <div key={category}>
-                    <h3 className="text-2xl font-serif font-semibold text-indigo-700 mb-6 border-l-4 border-indigo-400 pl-4 tracking-wide">
-                      {category}
-                    </h3>
-                    <div className="flex flex-wrap gap-5">
-                      {categorySkills.map((skill) => (
-                        <span
-                          key={skill.id}
-                          className="bg-indigo-200 text-indigo-900 font-semibold rounded-full px-5 py-2 text-sm cursor-pointer transition-all shadow-md hover:shadow-indigo-400 hover:scale-105"
-                          title={`Skill level: ${skill.level} / 5`}
-                        >
-                          {skill.name}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
+        <div className="mb-6 flex items-center justify-between">
+          <label htmlFor="headingColor" className="font-medium">Heading Color</label>
+          <input
+            type="color"
+            id="headingColor"
+            value={headingColor}
+            onChange={(e) => setHeadingColor(e.target.value)}
+            className="w-14 h-10 rounded cursor-pointer border border-gray-300"
+          />
+        </div>
+
+        <div className="flex justify-end gap-4">
+          <button
+            onClick={() => setShowColorPicker(false)}
+            className="px-5 py-2 rounded bg-gray-300 hover:bg-gray-400 transition"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleConfirmColors}
+            className="px-5 py-2 rounded bg-indigo-600 text-white hover:bg-indigo-700 transition"
+          >
+            Download PDF
+          </button>
         </div>
       </div>
+    </div>
+  );
 
-      {/* Custom Styles */}
-      <style jsx>{`
-        .underline-animation {
-          position: relative;
-          display: inline-block;
-        }
-        .underline-animation::after {
-          content: '';
-          position: absolute;
-          width: 100%;
-          height: 3px;
-          bottom: -6px;
-          left: 0;
-          background: linear-gradient(90deg, #4f46e5, #9333ea);
-          border-radius: 2px;
-          transform-origin: left;
-          transform: scaleX(0);
-          transition: transform 0.3s ease;
-        }
-        .underline-animation:hover::after {
-          transform: scaleX(1);
-        }
-      `}</style>
+  return (
+    <div
+      className="min-h-screen p-8 flex flex-col items-center font-sans bg-gray-50"
+      style={{ fontFamily: "'Inter', sans-serif" }}
+    >
+      {showColorPicker && <ColorPickerModal />}
+
+      <div
+        ref={resumeRef}
+        className="shadow-xl rounded-lg w-[800px] max-w-full p-10"
+        style={{ backgroundColor, color: textColor }}
+      >
+        {/* Header */}
+        <header className="border-b border-gray-300 pb-6 mb-10 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+          <div>
+            <h1
+              className="text-5xl font-extrabold tracking-wide leading-tight"
+              style={{ color: headingColor }}
+            >
+              {personalInfo.fullName || 'Your Name'}
+            </h1>
+            <p className="mt-2 text-sm max-w-md" style={{ color: textColor }}>
+              {personalInfo.email && <span>{personalInfo.email} &nbsp;&middot;&nbsp;</span>}
+              {personalInfo.phone && <span>{personalInfo.phone} &nbsp;&middot;&nbsp;</span>}
+              {personalInfo.linkedin && (
+                <a
+                  href={personalInfo.linkedin}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline"
+                  style={{ color: textColor }}
+                >
+                  LinkedIn
+                </a>
+              )}
+              {personalInfo.github && (
+                <>
+                  &nbsp;&middot;&nbsp;
+                  <a
+                    href={personalInfo.github}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline"
+                    style={{ color: textColor }}
+                  >
+                    GitHub
+                  </a>
+                </>
+              )}
+            </p>
+          </div>
+        </header>
+
+        {/* Summary */}
+        {summary && (
+          <section className="mb-10">
+            <h2 className="font-bold uppercase text-sm mb-3 tracking-widest" style={{ color: headingColor }}>
+              Profile Summary
+            </h2>
+            <p className="text-base leading-relaxed max-w-3xl" style={{ color: textColor }}>
+              {summary}
+            </p>
+          </section>
+        )}
+
+        {/* Experience */}
+        <section className="mb-10">
+          <h2 className="font-bold uppercase text-sm mb-5 tracking-widest" style={{ color: headingColor }}>
+            Experience
+          </h2>
+          {experience.map((e) => (
+            <div key={e.id} className="mb-8 last:mb-0">
+              <div className="flex justify-between items-center mb-1">
+                <h3 className="font-semibold text-lg" style={{ color: headingColor }}>
+                  {e.position}
+                </h3>
+                <span className="text-xs font-mono" style={{ color: textColor }}>
+                  {formatDate(e.startDate)} – {e.current ? 'Present' : formatDate(e.endDate)}
+                </span>
+              </div>
+              <p className="italic text-indigo-600 text-sm mb-3" style={{ color: headingColor }}>
+                {e.company}
+              </p>
+              <ul className="list-disc pl-5 text-sm space-y-1" style={{ color: textColor }}>
+                {e.bulletPoints.slice(0, 3).map((pt, i) => (
+                  <li key={i}>{pt}</li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </section>
+
+        {/* Education */}
+        <section className="mb-10">
+          <h2 className="font-bold uppercase text-sm mb-5 tracking-widest" style={{ color: headingColor }}>
+            Education
+          </h2>
+          {education.map((ed) => (
+            <div key={ed.id} className="mb-6 last:mb-0">
+              <div className="flex justify-between items-center mb-1">
+                <h3 className="font-semibold text-lg" style={{ color: headingColor }}>
+                  {ed.degree}
+                  {ed.field && `, ${ed.field}`}
+                </h3>
+                <span className="text-xs font-mono" style={{ color: textColor }}>
+                  {formatDate(ed.startDate)} – {formatDate(ed.endDate)}
+                </span>
+              </div>
+              <p className="italic text-indigo-600 text-sm" style={{ color: headingColor }}>
+                {ed.school}
+              </p>
+              {ed.gpa && (
+                <p className="text-xs mt-1" style={{ color: textColor }}>
+                  GPA: {ed.gpa}
+                </p>
+              )}
+            </div>
+          ))}
+        </section>
+
+        {/* Projects */}
+        <section className="mb-10">
+          <h2 className="font-bold uppercase text-sm mb-5 tracking-widest" style={{ color: headingColor }}>
+            Projects
+          </h2>
+          {projects.map((p) => (
+            <div key={p.id} className="mb-8 last:mb-0">
+              <div className="flex justify-between items-center mb-1">
+                <h3 className="font-semibold text-lg" style={{ color: headingColor }}>
+                  {p.title}
+                </h3>
+                <span className="text-xs font-mono" style={{ color: textColor }}>
+                  {formatDate(p.startDate)} – {formatDate(p.endDate)}
+                </span>
+              </div>
+              <p className="text-sm leading-relaxed" style={{ color: textColor }}>
+                {p.description}
+              </p>
+              {p.technologies.length > 0 && (
+                <div className="flex flex-wrap mt-4 gap-3">
+                  {p.technologies.map((tech, idx) => (
+                    <span
+                      key={idx}
+                      className="tech-badge"
+                      style={{ color: textColor, backgroundColor: '#e2e8f0' }}
+                    >
+                      {tech}
+                    </span>
+                  ))}
+                </div>
+              )}
+              {(p.link || p.github) && (
+                <div className="mt-3 text-xs flex gap-5">
+                  {p.link && (
+                    <a
+                      href={p.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline"
+                      style={{ color: textColor }}
+                    >
+                      Live Demo
+                    </a>
+                  )}
+                  {p.github && (
+                    <a
+                      href={p.github}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline"
+                      style={{ color: textColor }}
+                    >
+                      GitHub
+                    </a>
+                  )}
+                </div>
+              )}
+            </div>
+          ))}
+        </section>
+
+        {/* Skills */}
+        <section>
+          <h2 className="font-bold uppercase text-sm mb-5 tracking-widest" style={{ color: headingColor }}>
+            Skills
+          </h2>
+          {Object.entries(skillsByCategory).map(([category, items]) => (
+            <div key={category} className="mb-5">
+              <h4 className="text-sm font-semibold mb-3" style={{ color: headingColor }}>
+                {category}
+              </h4>
+              <div className="flex flex-wrap gap-4">
+                {items.map((skill) => (
+                  <span
+                    key={skill.id}
+                    className="skill-badge"
+                    style={{
+                      color: '#fff',
+                      background: `linear-gradient(135deg, ${headingColor}, ${textColor})`,
+                      boxShadow: `0 4px 8px ${headingColor}66`,
+                    }}
+                  >
+                    {skill.name}
+                  </span>
+                ))}
+              </div>
+            </div>
+          ))}
+        </section>
+      </div>
+
+      <button
+        onClick={handleDownloadClick}
+        className="mt-8 px-8 py-3 bg-indigo-700 hover:bg-indigo-800 text-white text-base font-semibold rounded-full shadow-lg transition-transform duration-200 ease-in-out"
+      >
+        Download as PDF
+      </button>
+
+      <style>
+        {`
+          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+
+          ul {
+            list-style-type: disc;
+            margin-left: 1.25rem;
+            padding-left: 0;
+          }
+
+          .skill-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 7px 16px;
+            border-radius: 9999px;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            white-space: nowrap;
+            user-select: none;
+            cursor: default;
+          }
+          .skill-badge:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+          }
+
+          .tech-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 6px 14px;
+            border-radius: 9999px;
+            box-shadow: inset 0 0 1px #cbd5e1, 0 2px 6px rgba(0, 0, 0, 0.08);
+            transition: background 0.3s ease;
+            user-select: none;
+          }
+          .tech-badge:hover {
+            background: #cbd5e1;
+          }
+
+          a {
+            text-decoration: none;
+          }
+          a:hover {
+            text-decoration: underline;
+          }
+        `}
+      </style>
     </div>
   );
 }
-
-// Reusable components for timeline and section title
-const SectionTitle: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <h2 className="text-4xl font-serif font-extrabold text-indigo-700 border-b-4 border-indigo-400 pb-3 mb-10 tracking-wide relative before:absolute before:left-0 before:top-0 before:h-full before:w-1 before:bg-indigo-400 before:rounded-sm before:opacity-80">
-    {children}
-  </h2>
-);
-
-interface TimelineItemProps {
-  title: string;
-  subtitle?: string;
-  startDate?: string;
-  endDate?: string;
-  current?: boolean;
-  children?: React.ReactNode;
-}
-
-const TimelineItem: React.FC<TimelineItemProps> = ({ title, subtitle, startDate, endDate, current, children }) => {
-  const formatDate = (dateString?: string) => {
-    if (!dateString) return '';
-    const date = new Date(dateString + '-01');
-    return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
-  };
-
-  return (
-    <article className="relative pl-8 before:absolute before:left-[-22px] before:top-2 before:h-5 before:w-5 before:rounded-full before:bg-indigo-500 before:ring-4 before:ring-indigo-300">
-      <header className="flex justify-between items-start mb-4 flex-wrap">
-        <div>
-          <h3 className="text-2xl font-bold text-gray-900">{title}</h3>
-          {subtitle && <p className="text-indigo-600 font-semibold">{subtitle}</p>}
-        </div>
-        {(startDate || endDate) && (
-          <time className="text-sm text-gray-500 font-mono whitespace-nowrap mt-1">
-            {formatDate(startDate)} — {current ? 'Present' : formatDate(endDate)}
-          </time>
-        )}
-      </header>
-      {children}
-    </article>
-  );
-};
